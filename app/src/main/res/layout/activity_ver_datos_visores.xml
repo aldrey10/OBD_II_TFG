@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#256A87"
+        tools:context=".ui.verdatos.VerDatosVisoresActivity"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-11dp">
+
+
+        <TextView
+            android:id="@+id/lblTipoDato11"
+            android:layout_width="360dp"
+            android:layout_height="62dp"
+            android:layout_weight="1"
+            android:background="#295D73"
+            android:gravity="center_vertical"
+            android:text="Torque referencia motor"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            tools:ignore="RtlCompat"
+            app:layout_constraintBottom_toTopOf="@+id/visor11"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtDato10"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/visor11"
+            android:layout_width="167dp"
+            android:layout_height="162dp"
+            android:layout_gravity="center"
+            app:initialValue="0"
+            app:maxValue="6000"
+            app:minValue="0"
+            app:totalNicks="120"
+            app:valuePerNick="50"
+            tools:layout_editor_absoluteX="569dp"
+            tools:layout_editor_absoluteY="1463dp"
+            app:layout_constraintBottom_toTopOf="@+id/txtDato11"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lblTipoDato11"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/txtDato11"
+            android:layout_width="162dp"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/visor11" />
+
+        <TextView
+            android:id="@+id/lblTipoDato9"
+            android:layout_width="180dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="#295D73"
+            android:gravity="center_vertical"
+            android:text="Torque referencia motor"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/visor9"
+            app:layout_constraintEnd_toStartOf="@+id/lblTipoDato10"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtDato7"
+            tools:ignore="RtlCompat"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/txtDato9"
+            android:layout_width="162dp"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/lblTipoDato11"
+            app:layout_constraintEnd_toStartOf="@+id/txtDato10"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/visor9" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/visor10"
+            android:layout_width="167dp"
+            android:layout_height="162dp"
+            android:layout_gravity="center"
+            app:initialValue="0"
+            app:layout_constraintBottom_toTopOf="@+id/txtDato10"
+            app:layout_constraintStart_toEndOf="@+id/visor9"
+            app:layout_constraintTop_toBottomOf="@+id/lblTipoDato10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:maxValue="6000"
+            app:minValue="0"
+            app:totalNicks="120"
+            app:valuePerNick="50" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/visor9"
+            android:layout_width="167dp"
+            android:layout_height="162dp"
+            android:layout_gravity="center"
+            app:initialValue="0"
+            app:layout_constraintBottom_toTopOf="@+id/txtDato9"
+            app:layout_constraintEnd_toStartOf="@+id/visor10"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblTipoDato9"
+            app:maxValue="6000"
+            app:minValue="0"
+            app:totalNicks="120"
+            app:valuePerNick="50" />
+
+        <TextView
+            android:id="@+id/lblTipoDato10"
+            android:layout_width="180dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="#295D73"
+            android:gravity="center_vertical"
+            android:text="Voltaje módulo control"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/visor10"
+            app:layout_constraintStart_toEndOf="@+id/lblTipoDato9"
+            app:layout_constraintTop_toBottomOf="@+id/txtDato8"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="RtlCompat" />
+
+        <TextView
+            android:id="@+id/txtDato10"
+            android:layout_width="162dp"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@id/lblTipoDato11"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/txtDato9"
+            app:layout_constraintTop_toBottomOf="@+id/visor10" />
+
+        <TextView
+            android:id="@+id/lblTipoDato5"
+            android:layout_width="180dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="#295D73"
+            android:gravity="center_vertical"
+            android:text="Temperatura del aceite del motor"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/visor5"
+            app:layout_constraintEnd_toStartOf="@+id/lblTipoDato6"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtDato3"
+            tools:ignore="RtlCompat"
+            tools:visibility="visible" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/visor7"
+            android:layout_width="167dp"
+            android:layout_height="162dp"
+            android:layout_gravity="center"
+            app:initialValue="0"
+            app:layout_constraintBottom_toTopOf="@+id/txtDato7"
+            app:layout_constraintEnd_toStartOf="@+id/visor8"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblTipoDato7"
+            app:maxValue="6000"
+            app:minValue="0"
+            app:totalNicks="120"
+            app:valuePerNick="50" />
+
+        <TextView
+            android:id="@+id/txtDato8"
+            android:layout_width="162dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="18dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/lblTipoDato10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/txtDato7"
+            app:layout_constraintTop_toBottomOf="@+id/visor8" />
+
+        <TextView
+            android:id="@+id/txtDato7"
+            android:layout_width="162dp"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/lblTipoDato9"
+            app:layout_constraintEnd_toStartOf="@+id/txtDato8"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/visor7" />
+
+        <TextView
+            android:id="@+id/lblTipoDato8"
+            android:layout_width="180dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="#295D73"
+            android:gravity="center_vertical"
+            android:text="Porcentaje torque actual"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/visor8"
+            app:layout_constraintStart_toEndOf="@+id/lblTipoDato7"
+            app:layout_constraintTop_toBottomOf="@+id/txtDato6"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="RtlCompat" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/visor8"
+            android:layout_width="167dp"
+            android:layout_height="162dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="18dp"
+            app:initialValue="0"
+            app:layout_constraintBottom_toTopOf="@+id/txtDato8"
+            app:layout_constraintStart_toEndOf="@+id/visor7"
+            app:layout_constraintTop_toBottomOf="@+id/lblTipoDato8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:maxValue="6000"
+            app:minValue="0"
+            app:totalNicks="120"
+            app:valuePerNick="50" />
+
+        <TextView
+            android:id="@+id/lblTipoDato7"
+            android:layout_width="180dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="#295D73"
+            android:gravity="center_vertical"
+            android:text="Porcentaje torque solicitado"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/visor7"
+            app:layout_constraintEnd_toStartOf="@+id/lblTipoDato8"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtDato5"
+            tools:ignore="RtlCompat"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/txtDato5"
+            android:layout_width="162dp"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/lblTipoDato7"
+            app:layout_constraintEnd_toStartOf="@+id/txtDato6"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/visor5" />
+
+        <TextView
+            android:id="@+id/txtDato6"
+            android:layout_width="162dp"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/lblTipoDato8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/txtDato5"
+            app:layout_constraintTop_toBottomOf="@+id/visor6" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/visor6"
+            android:layout_width="167dp"
+            android:layout_height="162dp"
+            android:layout_gravity="center"
+            app:initialValue="0"
+            app:layout_constraintBottom_toTopOf="@+id/txtDato6"
+            app:layout_constraintStart_toEndOf="@+id/visor5"
+            app:layout_constraintTop_toBottomOf="@+id/lblTipoDato6"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:maxValue="6000"
+            app:minValue="0"
+            app:totalNicks="120"
+            app:valuePerNick="50" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/visor5"
+            android:layout_width="167dp"
+            android:layout_height="162dp"
+            android:layout_gravity="center"
+            app:initialValue="0"
+            app:layout_constraintBottom_toTopOf="@+id/txtDato5"
+            app:layout_constraintEnd_toStartOf="@+id/visor6"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblTipoDato5"
+            app:maxValue="6000"
+            app:minValue="0"
+            app:totalNicks="120"
+            app:valuePerNick="50" />
+
+        <TextView
+            android:id="@+id/lblTipoDato6"
+            android:layout_width="180dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="#295D73"
+            android:gravity="center_vertical"
+            android:text="Posición del acelerador"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/visor6"
+            app:layout_constraintStart_toEndOf="@+id/lblTipoDato5"
+            app:layout_constraintTop_toBottomOf="@+id/txtDato4"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="RtlCompat" />
+
+        <TextView
+            android:id="@+id/lblTipoDato3"
+            android:layout_width="180dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="#295D73"
+            android:gravity="center_vertical"
+            android:text="Velocidad del flujo del aire MAF"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/visor3"
+            app:layout_constraintEnd_toStartOf="@+id/lblTipoDato4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtDato1"
+            tools:ignore="RtlCompat"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/txtDato4"
+            android:layout_width="162dp"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/lblTipoDato6"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/txtDato3"
+            app:layout_constraintTop_toBottomOf="@+id/visor4" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/visor4"
+            android:layout_width="167dp"
+            android:layout_height="162dp"
+            android:layout_gravity="center"
+            app:initialValue="0"
+            app:layout_constraintBottom_toTopOf="@+id/txtDato4"
+            app:layout_constraintStart_toEndOf="@+id/visor3"
+            app:layout_constraintTop_toBottomOf="@+id/lblTipoDato4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:maxValue="6000"
+            app:minValue="0"
+            app:totalNicks="120"
+            app:valuePerNick="50" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/visor3"
+            android:layout_width="167dp"
+            android:layout_height="162dp"
+            android:layout_gravity="center"
+            app:initialValue="0"
+            app:layout_constraintBottom_toTopOf="@+id/txtDato3"
+            app:layout_constraintEnd_toStartOf="@+id/visor4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblTipoDato3"
+            app:maxValue="6000"
+            app:minValue="0"
+            app:totalNicks="120"
+            app:valuePerNick="50" />
+
+        <TextView
+            android:id="@+id/lblTipoDato4"
+            android:layout_width="180dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="#295D73"
+            android:gravity="center_vertical"
+            android:text="Carga calculada del motor"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/visor4"
+            app:layout_constraintStart_toEndOf="@+id/lblTipoDato3"
+            app:layout_constraintTop_toBottomOf="@+id/txtDato2"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="RtlCompat" />
+
+        <TextView
+            android:id="@+id/txtDato3"
+            android:layout_width="162dp"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/lblTipoDato5"
+            app:layout_constraintEnd_toStartOf="@+id/txtDato4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/visor3" />
+
+        <TextView
+            android:id="@+id/lblTituloDatos"
+            android:layout_width="398dp"
+            android:layout_height="39dp"
+            android:layout_weight="1"
+            android:background="#074F6E"
+            android:text="   Campo de Datos"
+            android:textAlignment="textStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/spinnerTipoDatos"/>
+
+        <Spinner
+            android:id="@+id/spinnerTipoDatos"
+            android:layout_width="185dp"
+            android:layout_height="51dp"
+            android:contentDescription="@string/title_notifications"
+            android:entries="@array/tipo_datos"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lblTituloDatos"
+            app:layout_constraintBottom_toTopOf="@id/lblTipoDato1"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/txtDato1"
+            android:layout_width="162dp"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/lblTipoDato3"
+            app:layout_constraintEnd_toStartOf="@+id/txtDato2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/visor1" />
+
+
+        <TextView
+            android:id="@+id/txtDato2"
+            android:layout_width="162dp"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/lblTipoDato4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/txtDato1"
+            app:layout_constraintTop_toBottomOf="@+id/visor2" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/visor2"
+            android:layout_width="167dp"
+            android:layout_height="162dp"
+            android:layout_gravity="center"
+            app:initialValue="0"
+            app:layout_constraintBottom_toTopOf="@+id/txtDato2"
+            app:layout_constraintStart_toEndOf="@+id/visor1"
+            app:layout_constraintTop_toBottomOf="@+id/lblTipoDato2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:maxValue="6000"
+            app:minValue="0"
+            app:totalNicks="120"
+            app:valuePerNick="50" />
+
+        <de.nitri.gauge.Gauge
+            android:id="@+id/visor1"
+            android:layout_width="167dp"
+            android:layout_height="162dp"
+            android:layout_gravity="center"
+            app:initialValue="0"
+            app:layout_constraintBottom_toTopOf="@+id/txtDato1"
+            app:layout_constraintEnd_toStartOf="@+id/visor2"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblTipoDato1"
+            app:maxValue="6000"
+            app:minValue="0"
+            app:totalNicks="120"
+            app:valuePerNick="50" />
+
+        <TextView
+            android:id="@+id/lblTipoDato1"
+            android:layout_width="180dp"
+            android:layout_height="62dp"
+            android:layout_weight="1"
+            android:background="#295D73"
+            android:gravity="center_vertical"
+            android:text="Velocidad del vehículo"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/visor1"
+            app:layout_constraintEnd_toStartOf="@+id/lblTipoDato2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spinnerTipoDatos"
+            tools:ignore="RtlCompat"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/lblTipoDato2"
+            android:layout_width="180dp"
+            android:layout_height="62dp"
+            android:layout_weight="1"
+            android:background="#295D73"
+            android:gravity="center_vertical"
+            android:text="Revoluciones por minuto"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/visor2"
+            app:layout_constraintStart_toEndOf="@+id/lblTipoDato1"
+            app:layout_constraintTop_toBottomOf="@id/spinnerTipoDatos"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="RtlCompat" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

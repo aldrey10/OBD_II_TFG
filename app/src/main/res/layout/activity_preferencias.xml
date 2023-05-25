@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#256A87"
+        tools:context=".ui.configuracion.opcionesconf.PreferenciasActivity"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+
+
+        <CheckBox
+            android:id="@+id/checkBox5"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Temperatura del aceite del motor"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/checkBox6"
+            app:layout_constraintEnd_toStartOf="@id/btnRojo5"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkBox4" />
+
+        <CheckBox
+            android:id="@+id/checkBox11"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Temperatura del aceite del motor"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/txtEstadoCoche"
+            app:layout_constraintEnd_toStartOf="@id/btnRojo11"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkBox10"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnRojo11"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/txtEstadoCoche"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/checkBox11"
+            app:layout_constraintTop_toBottomOf="@id/checkBox10"
+            app:srcCompat="@drawable/redcircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnVerde11"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/txtEstadoCoche"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/checkBox11"
+            app:layout_constraintTop_toBottomOf="@id/checkBox10"
+            app:srcCompat="@drawable/greencircle"
+            tools:visibility="invisible" />
+
+        <CheckBox
+            android:id="@+id/checkBox6"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Posición del acelerador"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/checkBox7"
+            app:layout_constraintEnd_toStartOf="@id/btnRojo6"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkBox5" />
+
+        <CheckBox
+            android:id="@+id/checkBox9"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Torque referencia motor"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/checkBox10"
+            app:layout_constraintEnd_toStartOf="@id/btnRojo9"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkBox8" />
+
+        <CheckBox
+            android:id="@+id/checkBox7"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Porcentaje torque solicitado"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/checkBox8"
+            app:layout_constraintEnd_toStartOf="@id/btnRojo7"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkBox6" />
+
+        <CheckBox
+            android:id="@+id/checkBox10"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Voltaje módulo control"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/checkBox11"
+            app:layout_constraintEnd_toStartOf="@id/btnRojo10"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkBox9" />
+
+        <ImageView
+            android:id="@+id/btnVerde6"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox7"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@id/checkBox6"
+            app:layout_constraintTop_toBottomOf="@id/checkBox5"
+            app:srcCompat="@drawable/greencircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnRojo6"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox7"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/checkBox6"
+            app:layout_constraintTop_toBottomOf="@id/checkBox5"
+            app:srcCompat="@drawable/redcircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnRojo8"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/checkBox8"
+            app:layout_constraintTop_toBottomOf="@id/checkBox7"
+            app:srcCompat="@drawable/redcircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnVerde8"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@id/checkBox8"
+            app:layout_constraintTop_toBottomOf="@id/checkBox7"
+            app:srcCompat="@drawable/greencircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnRojo9"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/checkBox9"
+            app:layout_constraintTop_toBottomOf="@id/checkBox8"
+            app:srcCompat="@drawable/redcircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnRojo10"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox11"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/checkBox10"
+            app:layout_constraintTop_toBottomOf="@id/checkBox9"
+            app:srcCompat="@drawable/redcircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnVerde10"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox11"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/checkBox10"
+            app:layout_constraintTop_toBottomOf="@id/checkBox9"
+            app:srcCompat="@drawable/greencircle"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnVerde9"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/checkBox9"
+            app:layout_constraintTop_toBottomOf="@id/checkBox8"
+            app:srcCompat="@drawable/greencircle"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnVerde7"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_home"
+            app:layout_constraintBottom_toTopOf="@id/checkBox8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@id/checkBox7"
+            app:layout_constraintTop_toBottomOf="@id/checkBox6"
+            app:srcCompat="@drawable/greencircle"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnRojo7"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_home"
+            app:layout_constraintBottom_toTopOf="@id/checkBox8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/checkBox7"
+            app:layout_constraintTop_toBottomOf="@id/checkBox6"
+            app:srcCompat="@drawable/redcircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <CheckBox
+            android:id="@+id/checkBox1"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Velocidad del vehículo"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/checkBox2"
+            app:layout_constraintEnd_toStartOf="@id/btnRojo1"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spinnerTipoCampoDatos" />
+
+        <CheckBox
+            android:id="@+id/checkBox8"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Porcentaje torque actual"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/checkBox9"
+            app:layout_constraintEnd_toStartOf="@id/btnRojo8"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkBox7" />
+
+        <CheckBox
+            android:id="@+id/checkBox4"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Carga calculada del motor"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/checkBox5"
+            app:layout_constraintEnd_toStartOf="@id/btnRojo4"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkBox3" />
+
+        <CheckBox
+            android:id="@+id/checkBox3"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Velocidad del flujo del aire MAF"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/checkBox4"
+            app:layout_constraintEnd_toStartOf="@id/btnRojo3"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkBox2" />
+
+        <CheckBox
+            android:id="@+id/checkBox2"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Revoluciones por minuto"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/checkBox3"
+            app:layout_constraintEnd_toStartOf="@id/btnRojo2"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkBox1" />
+
+        <TextView
+            android:id="@+id/txtEstadoCoche"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="800dp"
+            android:layout_marginEnd="10dp"
+            android:text="Los datos disponibles se mostrarán con un punto verde a la derecha del dato. De lo contrario, habrá un punto rojo."
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/btnRojo3"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/checkBox3"
+            app:layout_constraintTop_toBottomOf="@id/checkBox2"
+            app:srcCompat="@drawable/redcircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnRojo1"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/checkBox1"
+            app:layout_constraintTop_toBottomOf="@id/btnDisponibilidad"
+            app:srcCompat="@drawable/redcircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnVerde1"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/checkBox1"
+            app:layout_constraintTop_toBottomOf="@id/spinnerTipoCampoDatos"
+            app:srcCompat="@drawable/greencircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnVerde3"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@id/checkBox3"
+            app:layout_constraintTop_toBottomOf="@id/checkBox2"
+            app:srcCompat="@drawable/greencircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnRojo4"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/checkBox4"
+            app:layout_constraintTop_toBottomOf="@id/checkBox3"
+            app:srcCompat="@drawable/redcircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnVerde5"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox6"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/checkBox5"
+            app:layout_constraintTop_toBottomOf="@id/checkBox4"
+            app:srcCompat="@drawable/greencircle"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnRojo5"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox6"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/checkBox5"
+            app:layout_constraintTop_toBottomOf="@id/checkBox4"
+            app:srcCompat="@drawable/redcircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnVerde4"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_notifications"
+            app:layout_constraintBottom_toTopOf="@id/checkBox5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@id/checkBox4"
+            app:layout_constraintTop_toBottomOf="@id/checkBox3"
+            app:srcCompat="@drawable/greencircle"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnVerde2"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_home"
+            app:layout_constraintBottom_toTopOf="@id/checkBox3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/checkBox2"
+            app:layout_constraintTop_toBottomOf="@id/checkBox1"
+            app:srcCompat="@drawable/greencircle"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btnRojo2"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="#256A87"
+            android:contentDescription="@string/title_home"
+            app:layout_constraintBottom_toTopOf="@id/checkBox3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/checkBox2"
+            app:layout_constraintTop_toBottomOf="@id/checkBox1"
+            app:srcCompat="@drawable/redcircle"
+            tools:ignore="DuplicateClickableBoundsCheck"
+            tools:visibility="invisible" />
+
+        <Button
+            android:id="@+id/btnDisponibilidad"
+            android:layout_width="158dp"
+            android:layout_height="55dp"
+            android:onClick="pedirEncender"
+            android:text="Pedir disponibilidad"
+            app:layout_constraintBottom_toTopOf="@id/checkBox1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/spinnerTipoCampoDatos"
+            app:layout_constraintTop_toBottomOf="@id/lblDatosDisponibles" />
+
+        <TextView
+            android:id="@+id/idTxtDisponibilidad"
+            android:layout_width="149dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="20dp"
+            android:text="Sin Conexión"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@id/checkBox1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@id/spinnerTipoCampoDatos"
+            app:layout_constraintTop_toBottomOf="@id/lblDatosDisponibles"
+            tools:visibility="invisible" />
+
+        <Spinner
+            android:id="@+id/spinnerTipoCampoDatos"
+            android:layout_width="185dp"
+            android:layout_height="53dp"
+            android:layout_marginStart="24dp"
+            android:contentDescription="@string/title_notifications"
+            android:entries="@array/tipo_datos"
+            app:layout_constraintBottom_toTopOf="@id/checkBox1"
+            app:layout_constraintEnd_toStartOf="@id/btnDisponibilidad"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lblDatosDisponibles" />
+
+        <TextView
+            android:id="@+id/lblDatosDisponibles"
+            android:layout_width="398dp"
+            android:layout_height="39dp"
+            android:layout_weight="1"
+            android:background="#074F6E"
+            android:text="   Qué datos quiere ver"
+            android:textAlignment="textStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintBottom_toTopOf="@id/spinnerTipoCampoDatos"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtConfiguracionName" />
+
+        <TextView
+            android:id="@+id/lblConfiguracionActiva"
+            android:layout_width="398dp"
+            android:layout_height="39dp"
+            android:layout_weight="1"
+            android:background="#074F6E"
+            android:text="   Configuración Activa"
+            android:textAlignment="textStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toTopOf="@id/txtConfiguracionName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txtConfiguracionName"
+            android:layout_width="271dp"
+            android:layout_height="41dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@id/lblDatosDisponibles"
+            app:layout_constraintEnd_toStartOf="@id/btnChangeConf"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lblConfiguracionActiva" />
+
+        <ImageButton
+            android:id="@+id/btnChangeConf"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:backgroundTint="#42AFDD"
+            android:contentDescription="@string/title_dashboard"
+            android:onClick="dialogConfiguraciones"
+            app:layout_constraintBottom_toTopOf="@id/lblDatosDisponibles"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@id/txtConfiguracionName"
+            app:layout_constraintTop_toBottomOf="@id/lblConfiguracionActiva"
+            app:layout_constraintVertical_bias="0.5"
+            app:srcCompat="@drawable/ic_action_cambiar_configuracion" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
+
+

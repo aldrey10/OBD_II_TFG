@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#256A87"
+    android:clickable="false"
+    android:descendantFocusability="beforeDescendants"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:layout_editor_absoluteX="0dp"
+    tools:layout_editor_absoluteY="-92dp">
+
+    <ImageButton
+        android:id="@+id/btnExportacion"
+        android:layout_width="175dp"
+        android:layout_height="150dp"
+        android:backgroundTint="#737575"
+        android:contentDescription="@string/title_notifications"
+        android:onClick="exportarDatos"
+        app:srcCompat="@drawable/ic_action_exportar_fichero"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnGrabacionDatos"
+        app:layout_constraintTop_toBottomOf="@+id/imgVisualizarParDatos" />
+
+    <TextView
+        android:id="@+id/textExportacion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:foregroundTint="#FFFFFFFF"
+        android:text="Exportar"
+        android:textColor="#FFFFFFFF"
+        app:drawableTint="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/btnExportacion"
+        app:layout_constraintStart_toStartOf="@+id/btnExportacion"
+        app:layout_constraintTop_toTopOf="@+id/btnExportacion" />
+
+    <ImageButton
+        android:id="@+id/imgVisualizarParDatos"
+        android:layout_width="175dp"
+        android:layout_height="150dp"
+        android:backgroundTint="#42AFDD"
+        android:contentDescription="@string/title_notifications"
+        android:onClick="cambiarAVerParDatoValor"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imgRegistros"
+        app:layout_constraintTop_toBottomOf="@+id/imgVisualizarDatos"
+        app:srcCompat="@drawable/ic_action_verpardatos"
+        tools:visibility="visible" />
+
+    <ImageButton
+        android:id="@+id/imgRegistros"
+        android:layout_width="175dp"
+        android:layout_height="150dp"
+        android:backgroundTint="#42AFDD"
+        android:contentDescription="@string/title_notifications"
+        android:onClick="cambiarARegistros"
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@+id/imgVisualizarParDatos"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgConfiguracion"
+        app:srcCompat="@drawable/ic_action_verdatos"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/textNada"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:text="Lista de Datos"
+        android:textColor="#FFFFFFFF"
+        app:layout_constraintEnd_toEndOf="@id/imgVisualizarParDatos"
+        app:layout_constraintStart_toStartOf="@id/imgVisualizarParDatos"
+        app:layout_constraintTop_toTopOf="@id/imgVisualizarParDatos" />
+
+    <TextView
+        android:id="@+id/textRegistros"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:foregroundTint="#FFFFFFFF"
+        android:text="Registros"
+        android:textColor="#FFFFFFFF"
+        app:drawableTint="@color/white"
+        app:layout_constraintEnd_toEndOf="@id/imgRegistros"
+        app:layout_constraintStart_toStartOf="@id/imgRegistros"
+        app:layout_constraintTop_toTopOf="@id/imgRegistros" />
+
+    <ListView
+        android:id="@+id/listaDispositivosBluetooth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:minHeight="48dp"
+        android:paddingTop="10dip"
+        android:paddingBottom="10dip"
+        android:textSize="20px"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <LinearLayout
+        android:id="@+id/snackbar"
+        android:layout_width="354dp"
+        android:layout_height="140dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="324dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/snackbar_action"
+            style="?attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorAccent"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/snackbar_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="center_vertical|right"
+            android:textAppearance="@style/TextAppearance.Design.Snackbar.Message" />
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtConectandonos"
+        android:layout_width="246dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="456dp"
+        android:textColor="#FFFFFFFF"
+        android:textSize="16sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtConectadosA"
+        android:layout_width="245dp"
+        android:layout_height="39dp"
+        android:layout_marginStart="108dp"
+        android:layout_marginTop="464dp"
+        android:textColor="#FFFFFFFF"
+        android:textSize="16sp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnConectarse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="456dp"
+        android:backgroundTint="#42AFDD"
+        android:onClick="iniciarConexion"
+        android:text="Iniciar Conexión"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/imgConfiguracion"
+        android:layout_width="175dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="#42AFDD"
+        android:contentDescription="@string/title_notifications"
+        android:onClick="cambiarAConfiguracion"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/imgRegistros"
+        app:layout_constraintEnd_toStartOf="@+id/imgVisualizarDatos"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_action_settings"
+        tools:visibility="visible" />
+
+    <ImageButton
+        android:id="@+id/imgVisualizarDatos"
+        android:layout_width="175dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="#42AFDD"
+        android:contentDescription="@string/title_notifications"
+        android:onClick="cambiarAVerDatos"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/imgVisualizarParDatos"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imgConfiguracion"
+        app:layout_constraintTop_toTopOf="parent"
+
+        app:srcCompat="@drawable/ic_action_registro"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/textVisualizarDatos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:text="Ver Datos"
+        android:textColor="#FFFFFFFF"
+        app:layout_constraintEnd_toEndOf="@id/imgVisualizarDatos"
+        app:layout_constraintStart_toStartOf="@id/imgVisualizarDatos"
+        app:layout_constraintTop_toTopOf="@id/imgVisualizarDatos" />
+
+    <TextView
+        android:id="@+id/textConfiguracion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:text="Configuración"
+        android:textColor="#FFFFFFFF"
+        app:layout_constraintEnd_toEndOf="@id/imgConfiguracion"
+        app:layout_constraintStart_toStartOf="@id/imgConfiguracion"
+        app:layout_constraintTop_toTopOf="@id/imgConfiguracion" />
+
+    <Button
+        android:id="@+id/btnCancelar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="350dp"
+        android:backgroundTint="#42AFDD"
+        android:onClick="cancelarConexion"
+        android:text="Cancelar Conexión"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btnGrabacionDatos"
+        android:layout_width="175dp"
+        android:layout_height="150dp"
+        android:backgroundTint="#737575"
+        android:clickable="false"
+        android:contentDescription="@string/title_notifications"
+        android:onClick="gestionarGrabarDatos"
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@+id/btnExportacion"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgRegistros"
+        app:srcCompat="@drawable/ic_action_grabar_datos" />
+
+    <TextView
+        android:id="@+id/textGrabacion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:foregroundTint="#FFFFFFFF"
+        android:text="Grabar"
+        android:textColor="#FFFFFFFF"
+        app:drawableTint="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/btnGrabacionDatos"
+        app:layout_constraintStart_toStartOf="@+id/btnGrabacionDatos"
+        app:layout_constraintTop_toTopOf="@+id/btnGrabacionDatos" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

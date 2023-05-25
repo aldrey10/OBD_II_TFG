@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#256A87"
+    tools:context=".ui.configuracion.opcionesconf.DatosCocheActivity">
+
+    <LinearLayout
+        android:id="@+id/snackbar"
+        android:layout_width="354dp"
+        android:layout_height="140dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnGuardarCambios"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/snackbar_action"
+            style="?attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorAccent"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/snackbar_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="center_vertical|right"
+            android:textAppearance="@style/TextAppearance.Design.Snackbar.Message" />
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnGuardarCambios"
+        android:layout_width="165dp"
+        android:layout_height="59dp"
+        android:backgroundTint="#42AFDD"
+        android:text="Guardar Cambios"
+        android:onClick="guardarCambios"
+        app:layout_constraintEnd_toStartOf="@id/btnRestablecer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnCambiarConfiguracion"
+        tools:visibility="invisible" />
+
+    <Button
+        android:id="@+id/btnRestablecer"
+        android:layout_width="165dp"
+        android:layout_height="59dp"
+        android:backgroundTint="#42AFDD"
+        android:text="Deshacer Cambios"
+        android:onClick="deshacerCambios"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btnGuardarCambios"
+        app:layout_constraintTop_toBottomOf="@id/btnCrearConfiguracion"
+        tools:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/lblidConfiguracionCoche"
+        android:layout_width="393dp"
+        android:layout_height="46dp"
+        android:layout_weight="1"
+        android:background="#074F6E"
+        android:text="   Nombre de configuración"
+        android:textAlignment="textStart"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/txtNombreConfiguracion"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/lblMarcaCoche"
+        android:layout_width="398dp"
+        android:layout_height="39dp"
+        android:layout_weight="1"
+        android:background="#074F6E"
+        android:text="   Marca del Vehículo"
+        android:textAlignment="textStart"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/spinnerMarca"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtNombreConfiguracion" />
+
+    <Spinner
+        android:id="@+id/spinnerMarca"
+        android:layout_width="313dp"
+        android:layout_height="51dp"
+        android:contentDescription="@string/title_notifications"
+        android:entries="@array/marcas_coche"
+        app:layout_constraintBottom_toTopOf="@id/lblModeloCoche"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.163"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lblMarcaCoche" />
+
+    <TextView
+        android:id="@+id/lblModeloCoche"
+        android:layout_width="398dp"
+        android:layout_height="39dp"
+        android:layout_weight="1"
+        android:background="#074F6E"
+        android:text="   Modelo"
+        android:textAlignment="textStart"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/inputModelo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinnerMarca" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/inputModelo"
+        android:layout_width="316dp"
+        android:layout_height="58dp"
+        android:background="#92C2D6"
+        android:hint="    Modelo"
+        app:layout_constraintBottom_toTopOf="@id/lblYearCoche"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.168"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lblModeloCoche" />
+
+    <TextView
+        android:id="@+id/lblYearCoche"
+        android:layout_width="398dp"
+        android:layout_height="39dp"
+        android:layout_weight="1"
+        android:background="#074F6E"
+        android:text="   Año"
+        android:textAlignment="textStart"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/spinnerYear"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModelo" />
+
+    <Spinner
+        android:id="@+id/spinnerYear"
+        android:layout_width="313dp"
+        android:layout_height="51dp"
+        android:contentDescription="@string/title_notifications"
+        android:entries="@array/year_coche"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.163"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lblYearCoche" />
+
+    <TextView
+        android:id="@+id/txtNombreConfiguracion"
+        android:layout_width="300dp"
+        android:layout_height="46dp"
+        android:textAlignment="gravity"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@id/lblMarcaCoche"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.163"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lblidConfiguracionCoche" />
+
+    <Button
+        android:id="@+id/btnCambiarConfiguracion"
+        android:layout_width="165dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="15dp"
+        android:backgroundTint="#42AFDD"
+        android:text="Cambiar Configuración"
+        android:onClick="cambiarConfiguracion"
+        app:layout_constraintBottom_toTopOf="@id/btnGuardarCambios"
+        app:layout_constraintEnd_toStartOf="@id/btnCrearConfiguracion"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinnerYear" />
+
+    <Button
+        android:id="@+id/btnCrearConfiguracion"
+        android:layout_width="165dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="15dp"
+        android:backgroundTint="#42AFDD"
+        android:text="Crear Configuración"
+        android:onClick="crearConfiguracion"
+        app:layout_constraintBottom_toTopOf="@id/btnRestablecer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btnCambiarConfiguracion"
+        app:layout_constraintTop_toBottomOf="@id/spinnerYear" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

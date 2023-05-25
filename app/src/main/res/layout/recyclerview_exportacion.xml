@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/txtConfigCocheExport"
+        android:layout_width="180dp"
+        android:layout_height="62dp"
+        android:textAlignment="center"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="hola"
+        tools:ignore="RtlCompat" />
+    <TextView
+        android:id="@+id/txtFechaViajeExport"
+        android:layout_width="140dp"
+        android:layout_height="62dp"
+        android:textAlignment="center"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintStart_toEndOf="@+id/txtConfigCocheExport"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="hola"
+        tools:ignore="RtlCompat" />
+    <CheckBox
+        android:id="@+id/checkBoxExport"
+        android:layout_width="50dp"
+        android:layout_height="62dp"
+        android:textAlignment="center"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/txtFechaViajeExport"
+        tools:ignore="RtlCompat" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
