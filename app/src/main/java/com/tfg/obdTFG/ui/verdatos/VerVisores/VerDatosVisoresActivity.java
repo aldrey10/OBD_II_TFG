@@ -1,32 +1,27 @@
-package com.tfg.obdTFG.ui.verdatos;
+package com.tfg.obdTFG.ui.verdatos.VerVisores;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 
 import android.annotation.SuppressLint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.tfg.obdTFG.Bluetooth;
+import com.tfg.obdTFG.bluetooth.Bluetooth;
 import com.tfg.obdTFG.MainActivity;
 import com.tfg.obdTFG.R;
 import com.tfg.obdTFG.db.DatoOBDHelper;
-import com.tfg.obdTFG.ui.configuracion.opcionesconf.PreferenciasActivity;
+import com.tfg.obdTFG.ui.verdatos.CodigoDatos;
+import com.tfg.obdTFG.ui.verdatos.TipoCombustible;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -37,6 +32,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
     private String msgTemporal;
     private Bluetooth bluetooth;
     private Menu menu;
+    private VerDatosVisoresViewModel viewModel;
     //private ViewModel viewmodel;
 
     private int rpmval = 0, currenttemp = 0, Enginedisplacement = 1500, Enginetype = 0, FaceColor = 0;
@@ -44,14 +40,14 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
     private ArrayList<Float> consumoMedio;
     private TextView RPM, TempAceiteMotor, VelocidadFlujoAire, CargaCalculadaMotor, PresionBarometricaAbsoluta, PresionCombustible, PresionMedidorTrenCombustible,
             PresionAbsColectorAdmision, PresionVaporSisEvaporativo, NivelCombustible, TipoCombustibleNombre, VelocidadConsumoCombustible, RelacionCombustibleAire,
-            TempLiquidoEnfriamiento, TempAireAmbiente, TempAireColectorAdmision, TempCatalizador, VelocidadVehiculo, TiempoMotorEncendido, VelocidadMedia, ConsumoMedio,
+            TempLiquidoEnfriamiento, TempAireAmbiente, TempAireColectorAdmision, TempCatalizador, VelocidadVehiculo,
             PosicionAcelerador, DistanciaLuzEncendidaFalla,  EGRComandado, FallaEGR, PurgaEvaporativaComand, CantidadCalentamientosDesdeNoFallas, DistanciaRecorridadSinLuzFallas,
             VoltajeModuloControl, SincroInyeccionCombustible, PorcentajeTorqueSolicitado, PorcentajeTorqueActual, TorqueReferenciaMotor;
 
     private Gauge GaugeRpm, GaugeTempAceiteMotor, GaugeVelocidadFlujoAire, GaugeCargaCalculadaMotor, GaugePresionBarometricaAbsoluta, GaugePresionCombustible,
             GaugePresionMedidorTrenCombustible, GaugePresionAbsColectorAdmision, GaugePresionVaporSisEvaporativo, GaugeNivelCombustible, GaugeTipoCombustibleNombre,
             GaugeVelocidadConsumoCombustible, GaugeRelacionCombustibleAire, GaugeTempLiquidoEnfriamiento, GaugeTempAireAmbiente, GaugeTempAireColectorAdmision,
-            GaugeTempCatalizador, GaugeVelocidadVehiculo, GaugeTiempoMotorEncendido, GaugeVelocidadMedia, GaugeConsumoMedio, GaugePosicionAcelerador, GaugeDistanciaLuzEncendidaFalla,
+            GaugeTempCatalizador, GaugeVelocidadVehiculo, GaugePosicionAcelerador, GaugeDistanciaLuzEncendidaFalla,
             GaugeEGRComandado, GaugeFallaEGR, GaugePurgaEvaporativaComand, GaugeCantidadCalentamientosDesdeNoFallas, GaugeDistanciaRecorridadSinLuzFallas,
             GaugeVoltajeModuloControl, GaugeSincroInyeccionCombustible, GaugePorcentajeTorqueSolicitado, GaugePorcentajeTorqueActual, GaugeTorqueReferenciaMotor;
 
@@ -59,19 +55,17 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
     /*private final String[] comandos = new String[]{"ATRV", "015C",  "0133", "0123", "012F", "0151", "015E", "0144", "0146",  "0103", "0104","0105",
     "0106", "0107", "0108", "0109", "010A", "010B", "010C", "010D", "010E", "010F", "0110", "0111", "0112", "0113", "0114", "011F", "0122", "0123"};*/
 
-    /*private final String[] comandosMotor = new String[]{"010D", "010C", "0110", "0104", "015C"};
-    private final String[] comandosPresion = new String[]{"0133", "010A", "0123", "010B", "0132"};
-    private final String[] comandosCombustible = new String[]{"012F", "0151", "015E", "0144"};
-    private final String[] comandosTemperatura = new String[]{"0146", "0105", "010F", "013C"};
-    private final String[] comandosDatosViaje = new String[]{"011F", "010D", "015E"};*/
+    /*private ArrayList<String> comandosMotor = new ArrayList<>();
+    private ArrayList<String> comandosPresion = new ArrayList<>();
+    private ArrayList<String> comandosCombustible = new ArrayList<>();
+    private ArrayList<String> comandosTemperatura = new ArrayList<>();*/
+    private ArrayList<String> comandos = new ArrayList<>();
 
-    private ArrayList<String> comandos = new ArrayList<String>();
 
     private static final int comandoMotor = 1;
     private static final int comandoPresion = 2;
     private static final int comandoCombustible = 3;
     private static final int comandoTemperatura = 4;
-    private static final int comandoDatosViaje = 5;
 
     private int comandoActivo = 1;
 
@@ -91,8 +85,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
     private HashMap<String, Boolean> presion;
     private HashMap<String, Boolean> combustible;
     private HashMap<String, Boolean> temperatura;
-    private HashMap<String, Boolean> datosViaje;
-
 
 
 
@@ -117,7 +109,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
 
         MainActivity.hiloDatosVisores = true;
 
-        comandos = MainActivity.comandos;
         // Variables para los datos del coche
         VelocidadVehiculo = (TextView) findViewById(R.id.txtDato1);
         GaugeVelocidadVehiculo = (Gauge) findViewById(R.id.visor1);
@@ -183,31 +174,23 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
         TempCatalizador = (TextView) findViewById(R.id.txtDato4);
         GaugeTempCatalizador = (Gauge) findViewById(R.id.visor4);
 
-        TiempoMotorEncendido = (TextView) findViewById(R.id.txtDato1);
-        GaugeTiempoMotorEncendido = (Gauge) findViewById(R.id.visor1);
-        VelocidadMedia= (TextView) findViewById(R.id.txtDato2);
-        GaugeVelocidadMedia = (Gauge) findViewById(R.id.visor2);
-        ConsumoMedio= (TextView) findViewById(R.id.txtDato3);
-        GaugeConsumoMedio = (Gauge) findViewById(R.id.visor3);
-
 
         velocidadMedia = new ArrayList<Float>();
         consumoMedio = new ArrayList<Float>();
 
 
         contactarBD = new DatoOBDHelper(this);
-
-        //establecerCodigos();
-        motor = contactarBD.consultarPreferenciasMotor();
-        presion = contactarBD.consultarPreferenciasPresion();
-        combustible = contactarBD.consultarPreferenciasCombustible();
-        temperatura = contactarBD.consultarPreferenciasTemperatura();
-        datosViaje = contactarBD.consultarPreferenciasDatosViaje();
-        cambiarTitulos("Motor");
-
         bluetooth = MainActivity.bluetooth;
 
+        viewModel = new VerDatosVisoresViewModel(contactarBD, bluetooth);
 
+        establecerCodigos();
+        comandos = MainActivity.comandos;
+        /*motor = viewModel.consultarPreferenciasMotor();
+        presion = viewModel.consultarPreferenciasPresion();
+        combustible = viewModel.consultarPreferenciasCombustible();
+        temperatura = viewModel.consultarPreferenciasTemperatura();*/
+        cambiarTitulos("Motor");
 
 
         Spinner spinnerTipoDato = findViewById(R.id.spinnerTipoDatos);
@@ -216,7 +199,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 String tipoDato = spinnerTipoDato.getSelectedItem().toString();
                 cambiarTitulos(tipoDato);
-                }
+            }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -231,6 +214,9 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         MainActivity.mainActivity = true;
+        if(bluetooth!=null){
+            viewModel.setEstamosEnViewModelVisores(false);
+        }
     }
 
     @Override
@@ -258,11 +244,22 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
         }
 
         if(bluetooth!=null){
-            if(bluetooth.getEstado()==Bluetooth.STATE_CONECTADOS){
+            if(viewModel.getBluetoothEstado()){
+                viewModel.setViewModelVisores(viewModel);
+                viewModel.setEstamosEnViewModelVisores(true);
+
+                final Observer<String> observer = new Observer<String>() {
+                    @Override
+                    public void onChanged(String misDatos) {
+                        mostrarDatos(misDatos);
+                    }
+                };
+                viewModel.getMiDato().observe(this, observer);
+
                 /*HandlerThread handlerThread = new HandlerThread("MyHandlerThread");
                 handlerThread.start();
                 Looper looper = handlerThread.getLooper();*/
-                MainActivity.handlerVerDatosVisores = new Handler(new Handler.Callback() {
+                /*MainActivity.handlerVerDatosVisores = new Handler(new Handler.Callback() {
                     @Override
                     public boolean handleMessage(Message msg) {
                         switch (msg.what) {
@@ -358,7 +355,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
 
         }
 
-        String send;
 
         switch (msgTemporal) {
             case "410D": {
@@ -368,9 +364,9 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                     GaugeVelocidadVehiculo.setValue(obdval);
                 }
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Velocidad del vehículo", obdval);
+                    viewModel.insertDBExport("Velocidad del vehículo", obdval);
                 }
-                contactarBD.insertValuesEstadisticasDB("Velocidad del vehículo", (float) obdval);
+                viewModel.insertValuesEstadisticasDB("Velocidad", (float) obdval);
                 break;
             }
             case "410C": {
@@ -384,9 +380,9 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 MainActivity.cocheEncendido = true;
                 cambiarMenuCocheEncendido();
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Revoluciones por minuto", val);
+                    viewModel.insertDBExport("Revoluciones por minuto", val);
                 }
-                contactarBD.insertValuesEstadisticasDB("Revoluciones por minuto", val);
+                viewModel.insertValuesEstadisticasDB("Revoluciones", val);
 
                 break;
             }
@@ -399,7 +395,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Tº del aire del colector de admisión", val);
+                    viewModel.insertDBExport("Tº del aire del colector de admisión", val);
                 }
 
                 break;
@@ -413,7 +409,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Carga calculada del motor", val);
+                    viewModel.insertDBExport("Carga calculada del motor", val);
                 }break;
             }
             case "415C": {
@@ -425,7 +421,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Temperatura del aceite del motor", val);
+                    viewModel.insertDBExport("Temperatura del aceite del motor", val);
                 }break;
             }
             case "4111": {
@@ -437,7 +433,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Posición del acelerador", val);
+                    viewModel.insertDBExport("Posición del acelerador", val);
                 }break;
             }
             case "4161": {
@@ -449,7 +445,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Porcentaje torque solicitado", val);
+                    viewModel.insertDBExport("Porcentaje torque solicitado", val);
                 }break;
             }
             case "4162": {
@@ -461,7 +457,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Porcentaje torque actual", val);
+                    viewModel.insertDBExport("Porcentaje torque actual", val);
                 }break;
             }
             case "4163": {
@@ -473,7 +469,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Torque referencia motor", val);
+                    viewModel.insertDBExport("Torque referencia motor", val);
                 }break;
             }
             case "4142": {
@@ -485,7 +481,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Voltaje módulo control", val);
+                    viewModel.insertDBExport("Voltaje módulo control", val);
                 }break;
             }
             case "4133": {
@@ -496,7 +492,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Presión barométrica absoluta", obdval);
+                    viewModel.insertDBExport("Presión barométrica absoluta", obdval);
                 }break;
             }
             case "410A": {
@@ -508,7 +504,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Presión del combustible", val);
+                    viewModel.insertDBExport("Presión del combustible", val);
                 }break;
             }
             case "4123": {
@@ -520,7 +516,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Presión medidor tren combustible", val);
+                    viewModel.insertDBExport("Presión medidor tren combustible", val);
                 }break;
             }
             case "410B": {
@@ -531,7 +527,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Presion absoluta colector admisión", obdval);
+                    viewModel.insertDBExport("Presion absoluta colector admisión", obdval);
                 }break;
             }
             case "4132": {
@@ -543,7 +539,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Presión del vapor del sistema evaporativo", val);
+                    viewModel.insertDBExport("Presión del vapor del sistema evaporativo", val);
                 }break;
             }
             case "412F": {
@@ -555,7 +551,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Nivel de combustible %", val);
+                    viewModel.insertDBExport("Nivel de combustible %", val);
                 }break;
             }
             case "4151": {
@@ -565,7 +561,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Tipo de combustible", obdval);
+                    viewModel.insertDBExport("Tipo de combustible", obdval);
                 }
                         /*GaugeDistanciaLuzEncendidaFalla.setMinValue(0);
                         GaugeDistanciaLuzEncendidaFalla.setMaxValue(65000);
@@ -583,9 +579,9 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Velocidad consumo de combustible", val);
+                    viewModel.insertDBExport("Velocidad consumo de combustible", val);
                 }
-                contactarBD.insertValuesEstadisticasDB("Velocidad consumo de combustible", (float) val);
+                viewModel.insertValuesEstadisticasDB("Consumo", (float) val);
                 break;
             }
             case "4144": {
@@ -597,7 +593,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Relación combustible-aire", val);
+                    viewModel.insertDBExport("Relación combustible-aire", val);
                 }break;
             }
             case "4121": {
@@ -609,7 +605,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Distancia con luz fallas encendida", val);
+                    viewModel.insertDBExport("Distancia con luz fallas encendida", val);
                 }break;
             }
             case "412C": {
@@ -621,7 +617,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("EGR comandado", val);
+                    viewModel.insertDBExport("EGR comandado", val);
                 }break;
             }
             case "412D": {
@@ -633,7 +629,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Falla EGR", val);
+                    viewModel.insertDBExport("Falla EGR", val);
                 }break;
             }
             case "412E": {
@@ -645,19 +641,19 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Purga evaporativa comandada", val);
+                    viewModel.insertDBExport("Purga evaporativa comandada", val);
                 }break;
             }
             case "4130": {
                 float val = (float) (obdval);
                 if(comandoActivo==comandoCombustible){
-                    String texto = String.valueOf(obdval) + " calentamientos.";
+                    String texto = String.valueOf(obdval) + " calent.";
                     CantidadCalentamientosDesdeNoFallas.setText(texto);
                     GaugeCantidadCalentamientosDesdeNoFallas.setValue(val);
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Cant. calentamiento sin fallas", val);
+                    viewModel.insertDBExport("Cant. calentamiento sin fallas", val);
                 }break;
             }
             case "4131": {
@@ -669,7 +665,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Distancia sin luz fallas encendida", val);
+                    viewModel.insertDBExport("Distancia sin luz fallas encendida", val);
                 }break;
             }
             case "415D": {
@@ -681,7 +677,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Sincronización inyección combustible", val);
+                    viewModel.insertDBExport("Sincronización inyección combustible", val);
                 }break;
             }
             case "4146": {
@@ -693,7 +689,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Temperatura del aire ambiente", val);
+                    viewModel.insertDBExport("Temperatura del aire ambiente", val);
                 }break;
             }
             case "4105": {
@@ -705,7 +701,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Tº del líquido de enfriamiento", val);
+                    viewModel.insertDBExport("Tº del líquido de enfriamiento", val);
                 }break;
             }
             case "410F": {
@@ -717,7 +713,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if(MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Tº del aire del colector de admisión", val);
+                    viewModel.insertDBExport("Tº del aire del colector de admisión", val);
                 }break;
             }
             case "413C": {
@@ -729,20 +725,19 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 }
 
                 if (MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Temperatura del catalizador", val);
+                    viewModel.insertDBExport("Temperatura del catalizador", val);
                 }
                 break;
             }
             case "411F": {
                 if (MainActivity.estamosCapturando) {
-                    contactarBD.insertDBExport("Tiempo con el motor encendido", obdval);
+                    viewModel.insertDBExport("Tiempo con el motor encendido", obdval);
                 }
                 break;
             }
         }
 
-
-        send = comandos.get(comandoAElegir);
+        String send = comandos.get(comandoAElegir);
         enviarMensajeADispositivo(send);
         if (comandoAElegir >= comandos.size() - 1) {
             comandoAElegir = 0;
@@ -772,144 +767,21 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
             mensaje = mensaje + "\r";
             // Get the message bytes and tell the BluetoothChatService to write
             byte[] send = mensaje.getBytes();
-            bluetooth.writeVisores(send);
+            viewModel.writeVisores(send);
         }
     }
 
     //establecemos los array de codigos que solicitaremos al OBD
-    /*public void establecerCodigos(){
-        motor = contactarBD.consultarPreferenciasMotor();
-        if(Objects.equals(motor.get("Velocidad del vehículo"), true)){
-            comandos.add(CodigoDatos.VelocidadVehiculo.getCodigo());
-        }
-        if(Objects.equals(motor.get("Revoluciones por minuto"), true)){
-            comandos.add(CodigoDatos.RPM.getCodigo());
-        }
-        if(Objects.equals(motor.get("Velocidad del flujo del aire MAF"), true)){
-            comandos.add(CodigoDatos.VelocidadFlujoAire.getCodigo());
-        }
-        if(Objects.equals(motor.get("Carga calculada del motor"), true)){
-            comandos.add(CodigoDatos.CargaCalculadaMotor.getCodigo());
-        }
-        if(Objects.equals(motor.get("Temperatura del aceite del motor"), true)){
-            comandos.add(CodigoDatos.TempAceiteMotor.getCodigo());
-        }
-        if(Objects.equals(motor.get("Posición del acelerador"), true)){
-            comandos.add(CodigoDatos.PosicionAcelerador.getCodigo());
-        }
-        if(Objects.equals(motor.get("Porcentaje torque solicitado"), true)){
-            comandos.add(CodigoDatos.PorcentajeTorqueSolicitado.getCodigo());
-        }
-        if(Objects.equals(motor.get("Porcentaje torque actual"), true)){
-            comandos.add(CodigoDatos.PorcentajeTorqueActual.getCodigo());
-        }
-        if(Objects.equals(motor.get("Torque referencia motor"), true)){
-            comandos.add(CodigoDatos.TorqueReferenciaMotor.getCodigo());
-        }
-        if(Objects.equals(motor.get("Voltaje módulo control"), true)){
-            comandos.add(CodigoDatos.VoltajeModuloControl.getCodigo());
-        }
+    public void establecerCodigos(){
+        motor = viewModel.consultarPreferenciasMotor();
+        presion = viewModel.consultarPreferenciasPresion();
+        combustible = viewModel.consultarPreferenciasCombustible();
+        temperatura = viewModel.consultarPreferenciasTemperatura();
 
-        if (comandos.isEmpty()){
-            comandos.add("010C");
-        }
-
-        presion = contactarBD.consultarPreferenciasPresion();
-        if(Objects.equals(presion.get("Presión barométrica absoluta"), true)){
-            comandosPresion.add(CodigoDatos.PresionBarometricaAbsoluta.getCodigo());
-        }
-        if(Objects.equals(presion.get("Presión del combustible"), true)){
-            comandosPresion.add(CodigoDatos.PresionCombustible.getCodigo());
-        }
-        if(Objects.equals(presion.get("Presión medidor tren combustible"), true)){
-            comandosPresion.add(CodigoDatos.PresionMedidorTrenCombustible.getCodigo());
-        }
-        if(Objects.equals(presion.get("Presion absoluta colector admisión"), true)){
-            comandosPresion.add(CodigoDatos.PresionAbsColectorAdmision.getCodigo());
-        }
-        if(Objects.equals(presion.get("Presión del vapor del sistema evaporativo"), true)){
-            comandosPresion.add(CodigoDatos.PresionVaporSisEvaporativo.getCodigo());
-        }
-
-        if (comandosPresion.isEmpty()){
-            comandosPresion.add("010C");
-        }
-
-        combustible = contactarBD.consultarPreferenciasCombustible();
-        if(Objects.equals(combustible.get("Nivel de combustible %"), true)){
-            comandosCombustible.add(CodigoDatos.NivelCombustible.getCodigo());
-        }
-        if(Objects.equals(combustible.get("Tipo de combustible"), true)){
-            comandosCombustible.add(CodigoDatos.TipoCombustibleNombre.getCodigo());
-        }
-        if(Objects.equals(combustible.get("Velocidad consumo de combustible"), true)){
-            comandosCombustible.add(CodigoDatos.VelocidadConsumoCombustible.getCodigo());
-        }
-        if(Objects.equals(combustible.get("Relación combustible-aire"), true)){
-            comandosCombustible.add(CodigoDatos.RelacionCombustibleAire.getCodigo());
-        }
-        if(Objects.equals(combustible.get("Distancia con luz fallas encendida"), true)){
-            comandosCombustible.add(CodigoDatos.DistanciaLuzEncendidaFalla.getCodigo());
-        }
-        if(Objects.equals(combustible.get("EGR comandado"), true)){
-            comandosCombustible.add(CodigoDatos.EGRComandado.getCodigo());
-        }
-        if(Objects.equals(combustible.get("Falla EGR"), true)){
-            comandosCombustible.add(CodigoDatos.FallaEGR.getCodigo());
-        }
-        if(Objects.equals(combustible.get("Purga evaporativa comandada"), true)){
-            comandosCombustible.add(CodigoDatos.PurgaEvaporativaComand.getCodigo());
-        }
-        if(Objects.equals(combustible.get("Cant. calentamiento sin fallas"), true)){
-            comandosCombustible.add(CodigoDatos.CantidadCalentamientosDesdeNoFallas.getCodigo());
-        }
-        if(Objects.equals(combustible.get("Distancia sin luz fallas encendida"), true)){
-            comandosCombustible.add(CodigoDatos.DistanciaRecorridadSinLuzFallas.getCodigo());
-        }
-        if(Objects.equals(combustible.get("Sincronización inyección combustible"), true)){
-            comandosCombustible.add(CodigoDatos.SincroInyeccionCombustible.getCodigo());
-        }
-
-        if (comandosCombustible.isEmpty()){
-            comandosCombustible.add("010C");
-        }
-
-        temperatura = contactarBD.consultarPreferenciasTemperatura();
-        if(Objects.equals(temperatura.get("Temperatura del aire ambiente"), true)){
-            comandosTemperatura.add(CodigoDatos.TempAireAmbiente.getCodigo());
-        }
-        if(Objects.equals(temperatura.get("Tº del líquido de enfriamiento"), true)){
-            comandosTemperatura.add(CodigoDatos.TempLiquidoEnfriamiento.getCodigo());
-        }
-        if(Objects.equals(temperatura.get("Tº del aire del colector de admisión"), true)){
-            comandosTemperatura.add(CodigoDatos.TempAireColectorAdmision.getCodigo());
-        }
-        if(Objects.equals(temperatura.get("Temperatura del catalizador"), true)){
-            comandosTemperatura.add(CodigoDatos.TempCatalizador.getCodigo());
-        }
-
-        if (comandosTemperatura.isEmpty()){
-            comandosTemperatura.add("010C");
-        }
-
-        datosViaje = contactarBD.consultarPreferenciasDatosViaje();
-        if(Objects.equals(datosViaje.get("Tiempo con el motor encendido"), true)){
-            comandosDatosViaje.add(CodigoDatos.TiempoMotorEncendido.getCodigo());
-        }
-        if(Objects.equals(datosViaje.get("Velocidad media del viaje"), true)){
-            comandosDatosViaje.add(CodigoDatos.VelocidadMedia.getCodigo());
-        }
-        if(Objects.equals(datosViaje.get("Consumo medio del viaje"), true)){
-            comandosDatosViaje.add(CodigoDatos.VelocidadMedia.getCodigo());
-        }
-
-        if (comandosDatosViaje.isEmpty()){
-            comandosDatosViaje.add("010C");
-        }
-    }*/
+    }
 
     public void cambiarTitulos (String tipoDato) {
-        //comandoAElegir=0;
+        comandoAElegir=0;
         TextView txt;
         Gauge gaugeView;
         switch (tipoDato) {
@@ -922,7 +794,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(motor.get("Velocidad del vehículo"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor1);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -938,7 +810,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(motor.get("Revoluciones por minuto"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor2);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -954,7 +826,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(motor.get("Velocidad del flujo del aire MAF"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor3);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -972,7 +844,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(motor.get("Carga calculada del motor"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor4);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -991,7 +863,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                     txt.setText("NO DISPONIBLE");
                     txt.setVisibility(View.VISIBLE);
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor5);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1010,7 +882,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                     txt.setText("NO DISPONIBLE");
                     txt.setVisibility(View.VISIBLE);
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor6);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1029,7 +901,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                     txt.setText("NO DISPONIBLE");
                     txt.setVisibility(View.VISIBLE);
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor7);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1048,7 +920,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                     txt.setText("NO DISPONIBLE");
                     txt.setVisibility(View.VISIBLE);
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor8);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1067,7 +939,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                     txt.setText("NO DISPONIBLE");
                     txt.setVisibility(View.VISIBLE);
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor9);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1086,7 +958,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                     txt.setText("NO DISPONIBLE");
                     txt.setVisibility(View.VISIBLE);
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor10);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1116,7 +988,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(presion.get("Presión barométrica absoluta"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor1);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1132,7 +1004,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(presion.get("Presión del combustible"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor2);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1148,7 +1020,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(presion.get("Presión medidor tren combustible"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor3);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1160,13 +1032,13 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
 
                 txt = findViewById(R.id.lblTipoDato4);
                 txt.setVisibility(View.VISIBLE);
-                txt.setText("Presion absoluta colector admisión");
+                txt.setText("Presión absoluta colector admisión");
                 txt = findViewById(R.id.txtDato4);
                 txt.setVisibility(View.VISIBLE);
-                if(Objects.equals(presion.get("Presion absoluta colector admisión"), false)){
+                if(Objects.equals(presion.get("Presión absoluta colector admisión"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor4);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1184,7 +1056,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(presion.get("Presión del vapor del sistema evaporativo"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor5);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1252,7 +1124,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(combustible.get("Nivel de combustible %"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor1);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1268,7 +1140,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(combustible.get("Tipo de combustible"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor2);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1280,7 +1152,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(combustible.get("Velocidad consumo de combustible"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor3);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1298,7 +1170,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(combustible.get("Relación combustible-aire"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor4);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1313,10 +1185,10 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 txt.setVisibility(View.VISIBLE);
                 txt = findViewById(R.id.txtDato5);
                 txt.setVisibility(View.VISIBLE);
-                if(Objects.equals(temperatura.get("Distancia con luz fallas encendida"), false)){
+                if(Objects.equals(combustible.get("Distancia con luz fallas encendida"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor5);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1331,10 +1203,10 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 txt.setVisibility(View.VISIBLE);
                 txt = findViewById(R.id.txtDato6);
                 txt.setVisibility(View.VISIBLE);
-                if(Objects.equals(temperatura.get("EGR comandado"), false)){
+                if(Objects.equals(combustible.get("EGR comandado"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor6);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1349,10 +1221,10 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 txt.setText("Falla EGR");
                 txt = findViewById(R.id.txtDato7);
                 txt.setVisibility(View.VISIBLE);
-                if(Objects.equals(temperatura.get("Falla EGR"), false)){
+                if(Objects.equals(combustible.get("Falla EGR"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor7);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1367,10 +1239,10 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 txt.setText("Purga evaporativa comandada");
                 txt = findViewById(R.id.txtDato8);
                 txt.setVisibility(View.VISIBLE);
-                if(Objects.equals(temperatura.get("Purga evaporativa comandada"), false)){
+                if(Objects.equals(combustible.get("Purga evaporativa comandada"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor8);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1385,10 +1257,10 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 txt.setText("Cant. calentamiento sin fallas");
                 txt = findViewById(R.id.txtDato9);
                 txt.setVisibility(View.VISIBLE);
-                if(Objects.equals(temperatura.get("Temperatura del aire ambiente"), false)){
+                if(Objects.equals(combustible.get("Cant. calentamiento sin fallas"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor9);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1403,10 +1275,10 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 txt.setText("Distancia sin luz fallas encendida");
                 txt = findViewById(R.id.txtDato10);
                 txt.setVisibility(View.VISIBLE);
-                if(Objects.equals(temperatura.get("Distancia sin luz fallas encendida"), false)){
+                if(Objects.equals(combustible.get("Distancia sin luz fallas encendida"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor10);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1421,10 +1293,10 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 txt.setText("Sincronización inyección combustible");
                 txt = findViewById(R.id.txtDato11);
                 txt.setVisibility(View.VISIBLE);
-                if(Objects.equals(temperatura.get("Sincronización inyección combustible"), false)){
+                if(Objects.equals(combustible.get("Sincronización inyección combustible"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor11);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1445,7 +1317,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(temperatura.get("Temperatura del aire ambiente"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor1);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1461,7 +1333,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(temperatura.get("Tº del líquido de enfriamiento"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor2);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1477,7 +1349,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(temperatura.get("Tº del aire del colector de admisión"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor3);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1495,7 +1367,7 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 if(Objects.equals(temperatura.get("Temperatura del catalizador"), false)){
                     txt.setText("NO DISPONIBLE");
                 }else{
-                    txt.setText("");
+                    txt.setText("Sin datos");
                 }
                 gaugeView = findViewById(R.id.visor4);
                 gaugeView.setVisibility(View.VISIBLE);
@@ -1562,123 +1434,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                 gaugeView = findViewById(R.id.visor11);
                 gaugeView.setVisibility(View.INVISIBLE);
 
-                break;
-            case "Datos de Viaje":
-                comandoActivo = comandoDatosViaje;
-
-                txt = findViewById(R.id.lblTipoDato1);
-                txt.setText("Tiempo con el motor encendido");
-                txt = findViewById(R.id.txtDato1);
-                if(Objects.equals(datosViaje.get("Tiempo con el motor encendido"), false)){
-                    txt.setText("NO DISPONIBLE");
-                }else{
-                    txt.setText("");
-                }
-                gaugeView = findViewById(R.id.visor1);
-                gaugeView.setVisibility(View.VISIBLE);
-                GaugeTiempoMotorEncendido.setMinValue(0);
-                GaugeTiempoMotorEncendido.setMaxValue(70000);
-                GaugeTiempoMotorEncendido.setTotalNicks(70);
-                GaugeTiempoMotorEncendido.setValuePerNick(1000);
-                GaugeTiempoMotorEncendido.setValue(0);
-
-                txt = findViewById(R.id.lblTipoDato2);
-                txt.setText("Velocidad media del viaje");
-                txt = findViewById(R.id.txtDato2);
-                if(Objects.equals(datosViaje.get("Velocidad media del viaje"), false)){
-                    txt.setText("NO DISPONIBLE");
-                }else{
-                    txt.setText("");
-                }
-                gaugeView = findViewById(R.id.visor2);
-                gaugeView.setVisibility(View.VISIBLE);
-                GaugeVelocidadMedia.setMinValue(0);
-                GaugeVelocidadMedia.setMaxValue(300);
-                GaugeVelocidadMedia.setTotalNicks(100);
-                GaugeVelocidadMedia.setValuePerNick(3);
-                GaugeVelocidadMedia.setValue(0);
-
-                txt = findViewById(R.id.lblTipoDato3);
-                txt.setText("Consumo medio del viaje");
-                txt = findViewById(R.id.txtDato3);
-                if(Objects.equals(datosViaje.get("Consumo medio del viaje"), false)){
-                    txt.setText("NO DISPONIBLE");
-                }else{
-                    txt.setText("");
-                }
-                gaugeView = findViewById(R.id.visor3);
-                gaugeView.setVisibility(View.VISIBLE);
-                GaugeConsumoMedio.setMinValue(0);
-                GaugeConsumoMedio.setMaxValue(50);
-                GaugeConsumoMedio.setTotalNicks(50);
-                GaugeConsumoMedio.setValuePerNick(1);
-                GaugeConsumoMedio.setValue(0);
-
-
-                txt = findViewById(R.id.lblTipoDato4);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.txtDato4);
-                txt.setText("");
-                txt.setVisibility(View.INVISIBLE);
-
-                txt = findViewById(R.id.lblTipoDato5);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.txtDato5);
-                txt.setText("");
-                txt.setVisibility(View.INVISIBLE);
-
-                txt = findViewById(R.id.lblTipoDato6);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.txtDato6);
-                txt.setText("");
-                txt.setVisibility(View.INVISIBLE);
-
-                txt = findViewById(R.id.lblTipoDato7);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.txtDato7);
-                txt.setText("");
-                txt.setVisibility(View.INVISIBLE);
-
-                txt = findViewById(R.id.lblTipoDato8);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.txtDato8);
-                txt.setText("");
-                txt.setVisibility(View.INVISIBLE);
-
-                txt = findViewById(R.id.lblTipoDato9);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.txtDato9);
-                txt.setText("");
-                txt.setVisibility(View.INVISIBLE);
-
-                txt = findViewById(R.id.lblTipoDato10);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.txtDato10);
-                txt.setText("");
-                txt.setVisibility(View.INVISIBLE);
-
-                txt = findViewById(R.id.lblTipoDato11);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.txtDato10);
-                txt.setText("");
-                txt.setVisibility(View.INVISIBLE);
-
-                gaugeView = findViewById(R.id.visor4);
-                gaugeView.setVisibility(View.INVISIBLE);
-                gaugeView = findViewById(R.id.visor5);
-                gaugeView.setVisibility(View.INVISIBLE);
-                gaugeView = findViewById(R.id.visor6);
-                gaugeView.setVisibility(View.INVISIBLE);
-                gaugeView = findViewById(R.id.visor7);
-                gaugeView.setVisibility(View.INVISIBLE);
-                gaugeView = findViewById(R.id.visor8);
-                gaugeView.setVisibility(View.INVISIBLE);
-                gaugeView = findViewById(R.id.visor9);
-                gaugeView.setVisibility(View.INVISIBLE);
-                gaugeView = findViewById(R.id.visor10);
-                gaugeView.setVisibility(View.INVISIBLE);
-                gaugeView = findViewById(R.id.visor11);
-                gaugeView.setVisibility(View.INVISIBLE);
                 break;
         }
     }

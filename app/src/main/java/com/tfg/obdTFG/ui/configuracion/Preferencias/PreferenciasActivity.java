@@ -1,13 +1,14 @@
-package com.tfg.obdTFG.ui.configuracion.opcionesconf;
+package com.tfg.obdTFG.ui.configuracion.Preferencias;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 
+import android.app.ProgressDialog;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Message;
 import android.view.Menu;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,48 +21,42 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.tfg.obdTFG.Bluetooth;
+import com.google.android.material.snackbar.Snackbar;
+import com.tfg.obdTFG.bluetooth.Bluetooth;
 import com.tfg.obdTFG.MainActivity;
 import com.tfg.obdTFG.R;
-import com.tfg.obdTFG.ViewModel;
 import com.tfg.obdTFG.db.DatoOBDHelper;
-import com.tfg.obdTFG.ui.verdatos.VerDatosVisoresActivity;
+import com.tfg.obdTFG.ui.verdatos.CodigoDatos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class PreferenciasActivity extends AppCompatActivity implements CambiarConfiguracionDesdePreferencias.CambiarConfiguracion {
-    public ViewModel viewModel;
+    public PreferenciasViewModel viewModel;
     private Menu menu;
     private DatoOBDHelper contactarBD;
     private HashMap<String, Boolean> motor;
     private HashMap<String, Boolean> presion;
     private HashMap<String, Boolean> combustible;
     private HashMap<String, Boolean> temperatura;
-    private HashMap<String, Boolean> datosViaje;
 
     private HashMap<String, Boolean> motorDisponibilidad;
     private HashMap<String, Boolean> presionDisponibilidad;
     private HashMap<String, Boolean> combustibleDisponibilidad;
     private HashMap<String, Boolean> temperaturaDisponibilidad;
-    private HashMap<String, Boolean> datosViajeDisponibilidad;
 
     private Boolean seHanHechoCambios = false;
-    private Handler handler;
-    private HandlerThread handlerThread;
-    public static final int MESSAGE_READ = 1;
-    public static final int PEDIR_COMANDOS = 2;
-    public static final int MESSAGE_WRITE = 3;
+    private Boolean primeraVezSeCreaObservador = true;
     boolean motorON;
     boolean primeraVez = true;
     boolean podemosActualizarDisponibilidadPreferencias = false;
-    boolean primeraVezPorActivity = true;
-    boolean peee =true;
 
     private int comandoAElegir = 0;
-    //private final String[] comandos = new String[]{"010C", "010D", "0110", "0104", "015C", "0133", "010A", "0123", "010B", "0132", "012F", "0151", "015E", "0144",
-    //        "0146", "0105", "010F", "013C", "011F", "0111", "0121", "012C", "012D", "012E", "0130", "0131", "0142", "015D", "0161", "0162", "0163"};
+    private final String[] comandosString = new String[]{"010C", "010D", "0110", "0104", "015C", "0133", "010A", "0123", "010B", "0132", "012F", "0151", "015E", "0144",
+            "0146", "0105", "010F", "013C", "011F", "0111", "0121", "012C", "012D", "012E", "0130", "0131", "0142", "015D", "0161", "0162", "0163"};
     private ArrayList<String> comandos = new ArrayList<>();
     private final int ITERACIONES_DISPONIBILIDAD = 4;
     private int contadorIter = 0;
@@ -76,6 +71,7 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
 
     private String configuracionActiva;
 
+    private ProgressDialog dialog;
 
 
     @Override
@@ -92,7 +88,8 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
             btnChangeConf.setVisibility(View.INVISIBLE);
         }
 
-        comandos = MainActivity.comandos;
+        ArrayList<String> stringList = new ArrayList<String>(Arrays.asList(comandosString));
+        comandos = stringList;
         Spinner spinnerTipoDato = findViewById(R.id.spinnerTipoCampoDatos);
         spinnerTipoDato.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -108,98 +105,42 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
         });
 
         contactarBD = new DatoOBDHelper(this);
+        viewModel = new PreferenciasViewModel(contactarBD, MainActivity.bluetooth);
 
         checkearDisponibilidad();
-
         iniciarPreferencias();
 
         mostrarDisponibilidadDatos();
-
         activarListenerCheckBoxes();
 
-        configuracionActiva = contactarBD.cargarConfiguracionCoche();
+        configuracionActiva = viewModel.cargarConfiguracionCoche();
         TextView txt = findViewById(R.id.txtConfiguracionName);
         txt.setText(configuracionActiva);
-
-
-        /*if(MainActivity.bluetooth!=null) {
-            if (MainActivity.bluetooth.getEstado() == Bluetooth.STATE_CONECTADOS) {
-                Button btn = findViewById(R.id.btnDisponibilidad);
-                btn.setVisibility(View.VISIBLE);
-                TextView txt = findViewById(R.id.idTxtDisponibilidad);
-                if(MainActivity.pidiendoPreferencias){
-                    System.out.println("\n\nkdsjfkladsjkfjasdfjadsjlf\n\n");
-                    btn.setVisibility(View.INVISIBLE);
-                    txt.setVisibility(View.VISIBLE);
-                    txt.setText("Buscando Disponibilidad...");
-                }else{
-                    txt.setVisibility(View.INVISIBLE);
-                }
-                try{
-                    HandlerThread handlerThread = new HandlerThread("MyHandlerThread");
-                    handlerThread.start();
-                    Looper looper = handlerThread.getLooper();
-                    MainActivity.handlerPreferencias = new Handler(looper) {
-                        @Override
-                        public void handleMessage(Message msg) {
-                            switch (msg.what) {
-                                case MESSAGE_WRITE:
-                                    byte[] writeBuf = (byte[]) msg.obj;
-                                    // construct a string from the buffer
-                                    String writeMessage = new String(writeBuf);
-                                    break;
-                                case PEDIR_COMANDOS:
-                                    // lista de comandos que se mandan a OBD II, es decir, lista de datos que queremos saber (velocidad, RPM, etc)
-                                    pedirMotorEncendido();
-                                    break;
-                                case MESSAGE_READ:
-                                    // interpretamos el mensaje que nos manda el OBD II (el valor)
-                                    interpretarDatos(msg.obj.toString());
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    };
-                    handler = MainActivity.handlerPreferencias;
-                    MainActivity.bluetooth.setHandlerVerDatos(handler);
-                    MainActivity.bluetooth.continuarHiloMotorEncendido();
-                }catch(Exception e){
-                    System.out.println(e);
-                }
-            }else{
-                Button btn = findViewById(R.id.btnDisponibilidad);
-                btn.setVisibility(View.INVISIBLE);
-                TextView txt = findViewById(R.id.idTxtDisponibilidad);
-                txt.setVisibility(View.VISIBLE);
-                txt.setText("Sin Conexión");
-            }
-        } else{
-            Button btn = findViewById(R.id.btnDisponibilidad);
-            btn.setVisibility(View.INVISIBLE);
-            TextView txt = findViewById(R.id.idTxtDisponibilidad);
-            txt.setVisibility(View.VISIBLE);
-            txt.setText("Sin Conexión");
-        }*/
-
 
     }
 
     public void onDestroy() {
         super.onDestroy();
         if(seHanHechoCambios){
-            contactarBD.guardarPreferencias(motor, presion, combustible, temperatura, datosViaje);
+            viewModel.guardarPreferencias(motor, presion, combustible, temperatura);
+
+            comandos = new ArrayList<>();
+            establecerCodigos();
+            MainActivity.comandos = comandos;
+            MainActivity.huboCambiosPreferencias = true;
             try{
-                //MainActivity.bluetooth.cancelarHiloMotorEncendido();
                 MainActivity.hiloDatosPreferencias = false;
             } catch (Exception e){
                 System.out.println(e);
             }
         }
         if(podemosActualizarDisponibilidadPreferencias){
-            contactarBD.actualizarDisponibilidad(motorDisponibilidad, presionDisponibilidad, combustibleDisponibilidad, temperaturaDisponibilidad, datosViajeDisponibilidad);
+            viewModel.actualizarDisponibilidad(motorDisponibilidad, presionDisponibilidad, combustibleDisponibilidad, temperaturaDisponibilidad);
         }
         MainActivity.mainActivity = true;
+        if(MainActivity.bluetooth!=null){
+            viewModel.setEstamosEnViewModelPreferencias(false);
+        }
     }
 
     @Override
@@ -211,7 +152,7 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
         // change color for icon 0
         Drawable yourdrawable = menu.getItem(0).getIcon();
         if (MainActivity.bluetooth!=null){
-            if(MainActivity.bluetooth.getEstado()==Bluetooth.STATE_CONECTADOS){
+            if(viewModel.getBluetoothEstado()){
                 yourdrawable.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.SRC_IN);
             }else{
                 yourdrawable.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_IN);
@@ -249,46 +190,139 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
         enviarMensajeADispositivo(send);
     }
 
+    public void establecerCodigos(){
+        motor = viewModel.consultarPreferenciasMotor();
+        if(Objects.equals(motor.get("Velocidad del vehículo"), true)){
+            comandos.add(CodigoDatos.VelocidadVehiculo.getCodigo());
+        }
+        if(Objects.equals(motor.get("Revoluciones por minuto"), true)){
+            comandos.add(CodigoDatos.RPM.getCodigo());
+        }
+        if(Objects.equals(motor.get("Velocidad del flujo del aire MAF"), true)){
+            comandos.add(CodigoDatos.VelocidadFlujoAire.getCodigo());
+        }
+        if(Objects.equals(motor.get("Carga calculada del motor"), true)){
+            comandos.add(CodigoDatos.CargaCalculadaMotor.getCodigo());
+        }
+        if(Objects.equals(motor.get("Temperatura del aceite del motor"), true)){
+            comandos.add(CodigoDatos.TempAceiteMotor.getCodigo());
+        }
+        if(Objects.equals(motor.get("Posición del acelerador"), true)){
+            comandos.add(CodigoDatos.PosicionAcelerador.getCodigo());
+        }
+        if(Objects.equals(motor.get("Porcentaje torque solicitado"), true)){
+            comandos.add(CodigoDatos.PorcentajeTorqueSolicitado.getCodigo());
+        }
+        if(Objects.equals(motor.get("Porcentaje torque actual"), true)){
+            comandos.add(CodigoDatos.PorcentajeTorqueActual.getCodigo());
+        }
+        if(Objects.equals(motor.get("Torque referencia motor"), true)){
+            comandos.add(CodigoDatos.TorqueReferenciaMotor.getCodigo());
+        }
+        if(Objects.equals(motor.get("Voltaje módulo control"), true)){
+            comandos.add(CodigoDatos.VoltajeModuloControl.getCodigo());
+        }
+
+        presion = viewModel.consultarPreferenciasPresion();
+        if(Objects.equals(presion.get("Presión barométrica absoluta"), true)){
+            comandos.add(CodigoDatos.PresionBarometricaAbsoluta.getCodigo());
+        }
+        if(Objects.equals(presion.get("Presión del combustible"), true)){
+            comandos.add(CodigoDatos.PresionCombustible.getCodigo());
+        }
+        if(Objects.equals(presion.get("Presión medidor tren combustible"), true)){
+            comandos.add(CodigoDatos.PresionMedidorTrenCombustible.getCodigo());
+        }
+        if(Objects.equals(presion.get("Presion absoluta colector admisión"), true)){
+            comandos.add(CodigoDatos.PresionAbsColectorAdmision.getCodigo());
+        }
+        if(Objects.equals(presion.get("Presión del vapor del sistema evaporativo"), true)){
+            comandos.add(CodigoDatos.PresionVaporSisEvaporativo.getCodigo());
+        }
+
+
+        combustible = viewModel.consultarPreferenciasCombustible();
+        if(Objects.equals(combustible.get("Nivel de combustible %"), true)){
+            comandos.add(CodigoDatos.NivelCombustible.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Tipo de combustible"), true)){
+            comandos.add(CodigoDatos.TipoCombustibleNombre.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Velocidad consumo de combustible"), true)){
+            comandos.add(CodigoDatos.VelocidadConsumoCombustible.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Relación combustible-aire"), true)){
+            comandos.add(CodigoDatos.RelacionCombustibleAire.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Distancia con luz fallas encendida"), true)){
+            comandos.add(CodigoDatos.DistanciaLuzEncendidaFalla.getCodigo());
+        }
+        if(Objects.equals(combustible.get("EGR comandado"), true)){
+            comandos.add(CodigoDatos.EGRComandado.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Falla EGR"), true)){
+            comandos.add(CodigoDatos.FallaEGR.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Purga evaporativa comandada"), true)){
+            comandos.add(CodigoDatos.PurgaEvaporativaComand.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Cant. calentamiento sin fallas"), true)){
+            comandos.add(CodigoDatos.CantidadCalentamientosDesdeNoFallas.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Distancia sin luz fallas encendida"), true)){
+            comandos.add(CodigoDatos.DistanciaRecorridadSinLuzFallas.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Sincronización inyección combustible"), true)){
+            comandos.add(CodigoDatos.SincroInyeccionCombustible.getCodigo());
+        }
+
+
+        temperatura = viewModel.consultarPreferenciasTemperatura();
+        if(Objects.equals(temperatura.get("Temperatura del aire ambiente"), true)){
+            comandos.add(CodigoDatos.TempAireAmbiente.getCodigo());
+        }
+        if(Objects.equals(temperatura.get("Tº del líquido de enfriamiento"), true)){
+            comandos.add(CodigoDatos.TempLiquidoEnfriamiento.getCodigo());
+        }
+        if(Objects.equals(temperatura.get("Tº del aire del colector de admisión"), true)){
+            comandos.add(CodigoDatos.TempAireColectorAdmision.getCodigo());
+        }
+        if(Objects.equals(temperatura.get("Temperatura del catalizador"), true)){
+            comandos.add(CodigoDatos.TempCatalizador.getCodigo());
+        }
+
+    }
+
     public void pedirMotorEncendido() {
         if (MainActivity.bluetooth != null) {
-            if (MainActivity.bluetooth.getEstado() == Bluetooth.STATE_CONECTADOS) {
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                MainActivity.pidiendoPreferencias = true;
-                Button btn = findViewById(R.id.btnDisponibilidad);
-                btn.setVisibility(View.INVISIBLE);
-                TextView txt = findViewById(R.id.idTxtDisponibilidad);
-                txt.setVisibility(View.VISIBLE);
-                txt.setText("Buscando Disponibilidad...");
+            if(viewModel.getBluetoothEstado()){
+
                 resetearDisponibilidades();
                 mostrarDisponibilidadDatos();
-                contadorIter = 0;
-                comandoAElegir = 0;
-                MainActivity.handlerVerDatosVisores = new Handler(new Handler.Callback() {
-                    @Override
-                    public boolean handleMessage(Message msg) {
-                        switch (msg.what) {
-                            case MESSAGE_WRITE:
-                                byte[] writeBuf = (byte[]) msg.obj;
-                                // construct a string from the buffer
-                                String writeMessage = new String(writeBuf);
-                                break;
-                            case PEDIR_COMANDOS:
-                                // lista de comandos que se mandan a OBD II, es decir, lista de datos que queremos saber (velocidad, RPM, etc)
-                                mandarPrimerMensaje();
-                                break;
-                            case MESSAGE_READ:
-                                // interpretamos el mensaje que nos manda el OBD II (el valor)
-                                interpretarDatos(msg.obj.toString());
-                                break;
-                            default:
-                                break;
+                MainActivity.comandoAElegir = 0;
+
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                MainActivity.pidiendoPreferencias = true;
+
+                if(primeraVezSeCreaObservador){
+                    primeraVezSeCreaObservador=false;
+                    viewModel.setViewModelPreferencias(viewModel);
+
+                    final Observer<String> observer = new Observer<String>() {
+                        @Override
+                        public void onChanged(String misDatos) {
+                            interpretarDatos(misDatos);
                         }
-                        return false;
-                    }
-                });
-                handler = MainActivity.handlerVerDatosVisores;
-                MainActivity.bluetooth.setHandlerVerDatos(handler);
-                MainActivity.mainActivity = false;
+                    };
+                    viewModel.getMiDato().observe(this, observer);
+                }
+                viewModel.setEstamosEnViewModelPreferencias(true);
+                enviarMensajeADispositivo(comandos.get(0));
+
+
+                dialog = ProgressDialog.show(PreferenciasActivity.this, "",
+                        "Buscando disponibilidad de datos. Por favor espere...", true);
+
             } else {
                 pedirQueSeConecteABluetooth();
             }
@@ -308,29 +342,9 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
         }
     }
 
-    /*public void pedirQueSeEnciendaMotor(){
-        PreferenciasActivity.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                TextView text = findViewById(R.id.txtEstadoCoche);
-                text.setText("Para saber la disponibilidad de los datos, será necesario que arranque el vehículo.");
-                Button btn = findViewById(R.id.btnDisponibilidad);
-                btn.setVisibility(View.VISIBLE);
-                TextView txt = findViewById(R.id.idTxtDisponibilidad);
-                txt.setVisibility(View.INVISIBLE);
-                txt.setText("Buscando Disponibilidad...");
-            }
-        });
-    }*/
 
     public void pedirQueSeConecteABluetooth(){
-        TextView text = findViewById(R.id.txtEstadoCoche);
-        text.setText("En primer lugar, conéctese con el dispositivo OBD II desde el menú principal.");
-        Button btn = findViewById(R.id.btnDisponibilidad);
-        btn.setVisibility(View.INVISIBLE);
-        TextView txt = findViewById(R.id.idTxtDisponibilidad);
-        txt.setText("Sin Conexión.");
-        txt.setVisibility(View.VISIBLE);
+        mostrarSnackBarMsg("En primer lugar, conéctese con el dispositivo OBD II través de Bluetooth.");
     }
 
     public void ponerMensajeAyudaColores(){
@@ -347,9 +361,6 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
 
 
     public void interpretarDatos(String mensaje){
-        if(!peee){
-            System.out.println("\n\nESTAMOS AQUIO\n");
-        }
 
         if(mensaje == null){
             String send;
@@ -379,7 +390,6 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
             mensaje = "";
         }
 
-        int obdval = 0;
         String msgTemporal = "";
         if (mensaje.length() > 4) {
             if (mensaje.substring(4, 6).equals("41"))
@@ -387,18 +397,12 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
                     msgTemporal = mensaje.substring(4, 8);
                     msgTemporal = msgTemporal.trim();
                     System.out.println("MI MENSAJE TEMPORAL ES: " + msgTemporal);
-                    if (mensaje.length()>12){
-                        obdval = Integer.parseInt(mensaje.substring(8, mensaje.length()), 16);
-                    }else{
-                        obdval = Integer.parseInt(mensaje.substring(8, mensaje.length()), 16);
-                    }
                 } catch (NumberFormatException nFE) {
                 }
         }
 
 
         String send;
-        System.out.println(primeraVez);
         if(primeraVez){
             if(msgTemporal.equals("410C")){
                 motorON = true;
@@ -591,14 +595,10 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         Button btn = findViewById(R.id.btnDisponibilidad);
                         btn.setVisibility(View.VISIBLE);
-                        TextView txt = findViewById(R.id.idTxtDisponibilidad);
-                        txt.setVisibility(View.INVISIBLE);
-                        txt.setText("Sin Petición");
-                        MainActivity.pidiendoPreferencias = false;
-                        MainActivity.mainActivity = true;
+                        viewModel.setEstamosEnViewModelPreferencias(false);
                         comandoAElegir=0;
-                        String send = comandos.get(comandoAElegir);
-                        enviarMensajeADispositivo(send);
+                        contadorIter=0;
+                        dialog.dismiss();
                     }
                 });
             }
@@ -1500,10 +1500,6 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
 
     }
 
-    public void setViewModel(ViewModel viewModel){
-        this.viewModel = viewModel;
-    }
-
     public void cambiarTitulos (String tipoDato) {
         CheckBox txt;
         switch (tipoDato) {
@@ -1685,36 +1681,6 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
                 txt = findViewById(R.id.checkBox11);
                 txt.setVisibility(View.INVISIBLE);
                 break;
-            case "Datos de Viaje":
-                txt = findViewById(R.id.checkBox1);
-                txt.setText("Tiempo con el motor encendido");
-                txt.setChecked(Boolean.TRUE.equals(datosViaje.get("Tiempo con el motor encendido")));
-
-                txt = findViewById(R.id.checkBox2);
-                txt.setText("Velocidad media del viaje");
-                txt.setChecked(Boolean.TRUE.equals(datosViaje.get("Velocidad media del viaje")));
-
-                txt = findViewById(R.id.checkBox3);
-                txt.setText("Consumo medio del viaje");
-                txt.setChecked(Boolean.TRUE.equals(datosViaje.get("Consumo medio del viaje")));
-
-                txt = findViewById(R.id.checkBox4);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.checkBox5);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.checkBox6);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.checkBox7);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.checkBox8);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.checkBox9);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.checkBox10);
-                txt.setVisibility(View.INVISIBLE);
-                txt = findViewById(R.id.checkBox11);
-                txt.setVisibility(View.INVISIBLE);
-                break;
         }
         mostrarDisponibilidadDatos();
     }
@@ -1736,9 +1702,6 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
                 break;
             case "Temperatura":
                 temperatura.put((String) checkBox.getText(), checkBox.isChecked());
-                break;
-            case "Datos de Viaje":
-                datosViaje.put((String) checkBox.getText(), checkBox.isChecked());
                 break;
         }
     }
@@ -1767,9 +1730,6 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
                 break;
             case "Temperatura":
                 temperaturaDisponibilidad.put((String) checkBox.getText(), disp);
-                break;
-            case "Datos de Viaje":
-                datosViajeDisponibilidad.put((String) checkBox.getText(), disp);
                 break;
         }
     }
@@ -1806,6 +1766,25 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
     }
 
     public void resetearDisponibilidades(){
+        seHanHechoCambios=true;
+
+        Map<String, Boolean> motorMap = motor;
+        for (Map.Entry<String, Boolean> set : motorMap.entrySet()) {
+            set.setValue(false);
+        }
+        Map<String, Boolean> presionMap = presion;
+        for (Map.Entry<String, Boolean> set : presionMap.entrySet()) {
+            set.setValue(false);
+        }
+        Map<String, Boolean> combustibleMap = combustible;
+        for (Map.Entry<String, Boolean> set : combustibleMap.entrySet()) {
+            set.setValue(false);
+        }
+        Map<String, Boolean> temperaturaMap = temperatura;
+        for (Map.Entry<String, Boolean> set : temperaturaMap.entrySet()) {
+            set.setValue(false);
+        }
+
         RPM = false;
         TempAceiteMotor = false;
         VelocidadFlujoAire = false;
@@ -1848,19 +1827,19 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
     @Override
     public ArrayList<String> consultarTodasLasConfiguraciones() {
         ArrayList<String> lista = new ArrayList<>();
-        lista = contactarBD.consultarTodasLasConfiguraciones();
+        lista = viewModel.consultarTodasLasConfiguraciones();
         return lista;
     }
 
     @Override
     public boolean consultarConfiguracionActiva(String nombre) {
-        return contactarBD.consultarConfiguracionActiva(nombre);
+        return viewModel.consultarConfiguracionActiva(nombre);
     }
 
     @Override
     public void cambiarConfiguracion(String nombre) {
-        contactarBD.desactivarConfiguracionActiva(configuracionActiva);
-        contactarBD.activarConfiguracion(nombre);
+        viewModel.desactivarConfiguracionActiva(configuracionActiva);
+        viewModel.activarConfiguracion(nombre);
 
         TextView txt = (TextView) findViewById(R.id.txtConfiguracionName);
         txt.setText(nombre);
@@ -1873,17 +1852,15 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
     }
 
     public void checkearDisponibilidad(){
-        motor = contactarBD.consultarPreferenciasMotor();
-        presion = contactarBD.consultarPreferenciasPresion();
-        combustible = contactarBD.consultarPreferenciasCombustible();
-        temperatura = contactarBD.consultarPreferenciasTemperatura();
-        datosViaje = contactarBD.consultarPreferenciasDatosViaje();
+        motor = viewModel.consultarPreferenciasMotor();
+        presion = viewModel.consultarPreferenciasPresion();
+        combustible = viewModel.consultarPreferenciasCombustible();
+        temperatura = viewModel.consultarPreferenciasTemperatura();
 
-        motorDisponibilidad = contactarBD.consultarPreferenciasMotorDisponibilidad();
-        presionDisponibilidad = contactarBD.consultarPreferenciasPresionDisponibilidad();
-        combustibleDisponibilidad = contactarBD.consultarPreferenciasCombustibleDisponibilidad();
-        temperaturaDisponibilidad = contactarBD.consultarPreferenciasTemperaturaDisponibilidad();
-        datosViajeDisponibilidad = contactarBD.consultarPreferenciasDatosViajeDisponibilidad();
+        motorDisponibilidad = viewModel.consultarPreferenciasMotorDisponibilidad();
+        presionDisponibilidad = viewModel.consultarPreferenciasPresionDisponibilidad();
+        combustibleDisponibilidad = viewModel.consultarPreferenciasCombustibleDisponibilidad();
+        temperaturaDisponibilidad = viewModel.consultarPreferenciasTemperaturaDisponibilidad();
 
         RPM = Boolean.TRUE.equals(motorDisponibilidad.get("Revoluciones por minuto"));
         TempAceiteMotor = Boolean.TRUE.equals(motorDisponibilidad.get("Temperatura del aceite del motor"));
@@ -1919,9 +1896,10 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
         TempAireColectorAdmision = Boolean.TRUE.equals(temperaturaDisponibilidad.get("Tº del aire del colector de admisión"));
         TempCatalizador = Boolean.TRUE.equals(temperaturaDisponibilidad.get("Temperatura del catalizador"));
 
-        TiempoMotorEncendido = Boolean.TRUE.equals(datosViajeDisponibilidad.get("Tiempo con el motor encendido"));
-        VelocidadMedia = Boolean.TRUE.equals(datosViajeDisponibilidad.get("Velocidad media del viaje"));
-        ConsumoMedio = Boolean.TRUE.equals(datosViajeDisponibilidad.get("Consumo medio del viaje"));
+    }
+
+    public void mostrarSnackBarMsg(String mensaje){
+        Snackbar.make(findViewById(R.id.snackbar_preferencias), mensaje, 6000).show();
     }
 }
 

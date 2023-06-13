@@ -1,8 +1,7 @@
-package com.tfg.obdTFG.ui;
+package com.tfg.obdTFG.ui.exportaciones;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -10,20 +9,16 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
-import android.widget.CheckBox;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tfg.obdTFG.databinding.ActivityExportacionBinding;
 import com.tfg.obdTFG.db.DatoOBDHelper;
-import com.tfg.obdTFG.ui.adapter.ExportacionAdapter;
+import com.tfg.obdTFG.ui.exportaciones.adapter.ExportacionAdapter;
 
 import com.tfg.obdTFG.R;
 

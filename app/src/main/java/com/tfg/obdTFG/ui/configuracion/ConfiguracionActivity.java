@@ -2,24 +2,19 @@ package com.tfg.obdTFG.ui.configuracion;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
-import com.tfg.obdTFG.Bluetooth;
+import com.tfg.obdTFG.bluetooth.Bluetooth;
 import com.tfg.obdTFG.MainActivity;
 import com.tfg.obdTFG.R;
-import com.tfg.obdTFG.ViewModel;
-
-import java.util.ArrayList;
+import com.tfg.obdTFG.ui.configuracion.Preferencias.PreferenciasActivity;
 
 public class ConfiguracionActivity extends AppCompatActivity {
-    public ViewModel viewModel;
     private Menu menu;
 
     @Override
@@ -67,12 +62,12 @@ public class ConfiguracionActivity extends AppCompatActivity {
 
 
     public void cambiarADatosVehiculo (View view){
-        Intent intent = new Intent(ConfiguracionActivity.this, com.tfg.obdTFG.ui.configuracion.opcionesconf.DatosCocheActivity.class);
+        Intent intent = new Intent(ConfiguracionActivity.this, com.tfg.obdTFG.ui.configuracion.DatosCoche.DatosCocheActivity.class);
         startActivity(intent);
     }
 
     public void cambiarAPreferencias (View view){
-        Intent intent = new Intent(ConfiguracionActivity.this, com.tfg.obdTFG.ui.configuracion.opcionesconf.PreferenciasActivity.class);
+        Intent intent = new Intent(ConfiguracionActivity.this, PreferenciasActivity.class);
         startActivity(intent);
     }
 

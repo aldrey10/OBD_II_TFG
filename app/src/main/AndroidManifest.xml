@@ -23,7 +23,7 @@
         android:theme="@style/Theme.OBDIITFG"
         tools:targetApi="31">
         <activity
-            android:name=".ui.verdatos.VerDatosParDatoValorActivity"
+            android:name=".ui.verdatos.VerDatoParValor.VerDatosParDatoValorActivity"
             android:exported="false"
             android:label="Transmisión de Datos">
             <meta-data
@@ -31,7 +31,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ui.configuracion.opcionesconf.DatosCocheActivity"
+            android:name=".ui.configuracion.DatosCoche.DatosCocheActivity"
             android:exported="false"
             android:label="Datos del Vehículo">
             <meta-data
@@ -39,7 +39,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ui.configuracion.opcionesconf.PreferenciasActivity"
+            android:name=".ui.configuracion.Preferencias.PreferenciasActivity"
             android:exported="false"
             android:label="Preferencias">
             <meta-data
@@ -47,7 +47,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ui.verdatos.VerDatosVisoresActivity"
+            android:name=".ui.verdatos.VerVisores.VerDatosVisoresActivity"
             android:exported="false"
             android:label="Visualización de Datos">
             <meta-data
@@ -55,7 +55,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ui.verdatos.EstadisticasActivity"
+            android:name=".ui.verdatos.VerEstadisticas.EstadisticasActivity"
             android:exported="false"
             android:label="Registros">
             <meta-data
@@ -71,7 +71,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ui.ExportacionActivity"
+            android:name=".ui.exportaciones.ExportacionActivity"
             android:exported="false"
             android:label="Viajes">
             <meta-data
@@ -94,7 +94,7 @@
                 android:value="" />
         </activity>
 
-        <service android:name=".ServicioAcelerometros"></service>
+        <service android:name=".acelerometros.ServicioAcelerometros"></service>
 
     </application>
 

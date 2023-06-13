@@ -117,7 +117,6 @@
         <item>Presión</item>
         <item>Combustible</item>
         <item>Temperatura</item>
-        <item>Datos de Viaje</item>
     </string-array>
     <string-array name="opciones_guardar_datos_coche">
         <item>Sobrescribir configuración actual</item>

@@ -10,10 +10,42 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#256A87"
-        tools:context=".ui.configuracion.opcionesconf.PreferenciasActivity"
+        tools:context=".ui.configuracion.Preferencias.PreferenciasActivity"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp">
 
+
+        <LinearLayout
+            android:id="@+id/snackbar_preferencias"
+            android:layout_width="354dp"
+            android:layout_height="140dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="324dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <Button
+                android:id="@+id/snackbar_action"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorAccent"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/snackbar_text_preferencias"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:gravity="center_vertical|right"
+                android:textAppearance="@style/TextAppearance.Design.Snackbar.Message" />
+
+
+        </LinearLayout>
 
         <CheckBox
             android:id="@+id/checkBox5"
@@ -528,27 +560,11 @@
             app:layout_constraintStart_toEndOf="@id/spinnerTipoCampoDatos"
             app:layout_constraintTop_toBottomOf="@id/lblDatosDisponibles" />
 
-        <TextView
-            android:id="@+id/idTxtDisponibilidad"
-            android:layout_width="149dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="20dp"
-            android:text="Sin Conexión"
-            android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@id/checkBox1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/spinnerTipoCampoDatos"
-            app:layout_constraintTop_toBottomOf="@id/lblDatosDisponibles"
-            tools:visibility="invisible" />
-
         <Spinner
             android:id="@+id/spinnerTipoCampoDatos"
             android:layout_width="185dp"
             android:layout_height="53dp"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="15dp"
             android:contentDescription="@string/title_notifications"
             android:entries="@array/tipo_datos"
             app:layout_constraintBottom_toTopOf="@id/checkBox1"

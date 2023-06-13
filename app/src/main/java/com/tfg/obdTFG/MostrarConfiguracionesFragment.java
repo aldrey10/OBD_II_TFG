@@ -11,9 +11,6 @@ import android.widget.Button;
 
 import androidx.fragment.app.DialogFragment;
 
-import com.google.android.material.snackbar.Snackbar;
-import com.tfg.obdTFG.ui.configuracion.opcionesconf.CambiarConfiguracionCocheFragment;
-
 import java.util.ArrayList;
 
 public class MostrarConfiguracionesFragment extends DialogFragment {

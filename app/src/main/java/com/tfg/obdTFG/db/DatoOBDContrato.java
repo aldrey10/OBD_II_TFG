@@ -22,8 +22,7 @@ public class DatoOBDContrato {
         public static final String MARCA = "marca";
         public static final String MODELO = "modelo";
         public static final String YEAR = "año";
-        public static final String ID_CONGIGURACION = "idConfiguracion";
-        public static final String ID = "id";
+        public static final String ID_CONFIGURACION = "idConfiguracion";
 
 
         public static final String ESTADISTICAS_TABLA ="EstadisticasTabla";
@@ -35,24 +34,24 @@ public class DatoOBDContrato {
 
         public static final String DATOS_EXPORT ="ExportTabla";
 
-        public static final String NOMBRE_DATO_EXPORT = "name_export";
-        public static final String VALUE_EXPORT = "value_export";
+        public static final String NOMBRE_DATO_EXPORT = "nombreDatoExport";
+        public static final String VALUE_EXPORT = "valorExport";
         public static final String FECHAHORA = "fecha";
-        public static final String ID_VALOR_EXPORT= "idValor_export";
-        public static final String ID_VIAJE = "idValor_viaje";
+        public static final String ID_VALOR_EXPORT= "idValorExport";
+        public static final String ID_VIAJE = "idValorViaje";
 
 
         public static final String TABLE_VIAJES = "TableViajes";
 
-        public static final String ID_VIAJE_TABLE_VIAJE = "id_viaje";
-        public static final String FECHA_VIAJE = "fecha_viaje";
-        public static final String COCHE_VIAJE = "coche_viaje";
+        public static final String ID_VIAJE_TABLE_VIAJE = "idViaje";
+        public static final String FECHA_VIAJE = "fechaViaje";
+        public static final String COCHE_VIAJE = "configuracionViaje";
 
 
         public static final String TABLE_BACHES = "tableBaches";
 
-        public static final String ID_ACELARACION_BACHE = "id_aceleracion_bache";
-        public static final String GRUPO_ACELERACION_BACHE = "grupo_aceleracion_bache";
+        public static final String ID_ACELARACION_BACHE = "idAceleracionBache";
+        public static final String GRUPO_ACELERACION_BACHE = "grupoAceleracionBache";
 
     }
 

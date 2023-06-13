@@ -6,20 +6,20 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
-import com.tfg.obdTFG.ui.Exportacion;
+import com.tfg.obdTFG.ui.exportaciones.Exportacion;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 
 public class DatoOBDHelper extends SQLiteOpenHelper{
@@ -35,27 +35,31 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
 
-        //SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        sqLiteDatabase = getWritableDatabase();
         /*sqLiteDatabase.execSQL("PRAGMA foreign_keys=ON");*/
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS CocheDatos");
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS DatoOBD");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS EstadisticasTabla");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS ExportTabla");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS TableViajes");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS tableBaches");
+
 
         //creacion de tabla
         sqLiteDatabase.execSQL("CREATE TABLE " + DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE + " ("
-                + DatoOBDContrato.EntradaDatoOBD.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION + " TEXT NOT NULL,"
+                + DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION + " TEXT PRIMARY KEY,"
                 + DatoOBDContrato.EntradaDatoOBD.MARCA + " TEXT NOT NULL,"
                 + DatoOBDContrato.EntradaDatoOBD.MODELO + " TEXT NOT NULL,"
                 + DatoOBDContrato.EntradaDatoOBD.YEAR + " TEXT NOT NULL,"
                 + DatoOBDContrato.EntradaDatoOBD.CONFIGURACION_ACTIVA + " INTEGER NOT NULL,"
-                + "UNIQUE (" + DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION + "))");
+                + "UNIQUE (" + DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION + "))");
 
 
         //insercion de datos
         ContentValues values= new ContentValues();
 
         // Pares clave-valor
-        values.put(DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION, "Predeterminada");
+        values.put(DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION, "Predeterminada");
         values.put(DatoOBDContrato.EntradaDatoOBD.MARCA, "Alfa Romeo");
         values.put(DatoOBDContrato.EntradaDatoOBD.MODELO, "Giulia");
         values.put(DatoOBDContrato.EntradaDatoOBD.YEAR, "2018");
@@ -550,8 +554,60 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
         // Insertar...
         sqLiteDatabase.insert(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, null, values);
 
+        //insercion de datos
+        values = new ContentValues();
+
+        // Pares clave-valor
+        values.put(DatoOBDContrato.EntradaDatoOBD.NOMBRE_DATO, "Revolucion media del viaje");
+        values.put(DatoOBDContrato.EntradaDatoOBD.NOMBRE_CONFIGURACION, "Predeterminada");
+        values.put(DatoOBDContrato.EntradaDatoOBD.ACTIVADO, 1);
+        values.put(DatoOBDContrato.EntradaDatoOBD.CODIGO_DATO, "010C");
+        values.put(DatoOBDContrato.EntradaDatoOBD.TIPO_DATO, "datosViaje");
+        values.put(DatoOBDContrato.EntradaDatoOBD.DISPONIBLE, 1);
+
+        // Insertar...
+        sqLiteDatabase.insert(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, null, values);
 
 
+        //creacion de tabla
+        sqLiteDatabase.execSQL("CREATE TABLE " + DatoOBDContrato.EntradaDatoOBD.ESTADISTICAS_TABLA + " ("
+                + DatoOBDContrato.EntradaDatoOBD.ID_VALOR + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + DatoOBDContrato.EntradaDatoOBD.NOMBRE_ESTADISTICA + " TEXT NOT NULL,"
+                + DatoOBDContrato.EntradaDatoOBD.VALOR + " FLOAT NOT NULL,"
+                + "UNIQUE (" + DatoOBDContrato.EntradaDatoOBD.ID_VALOR + "))");
+
+        //insercion de datos
+        values = new ContentValues();
+
+        // Pares clave-valor
+        values.put(DatoOBDContrato.EntradaDatoOBD.NOMBRE_ESTADISTICA, "tiempoMotorEncendido");
+        values.put(DatoOBDContrato.EntradaDatoOBD.VALOR, 0);
+
+        // Insertar...
+        sqLiteDatabase.insert(DatoOBDContrato.EntradaDatoOBD.ESTADISTICAS_TABLA, null, values);
+
+
+        //creacion de tabla
+        sqLiteDatabase.execSQL("CREATE TABLE " + DatoOBDContrato.EntradaDatoOBD.DATOS_EXPORT + " ("
+                + DatoOBDContrato.EntradaDatoOBD.ID_VALOR_EXPORT + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + DatoOBDContrato.EntradaDatoOBD.NOMBRE_DATO_EXPORT + " TEXT NOT NULL,"
+                + DatoOBDContrato.EntradaDatoOBD.VALUE_EXPORT + " FLOAT NOT NULL,"
+                + DatoOBDContrato.EntradaDatoOBD.FECHAHORA + " TEXT NOT NULL,"
+                + DatoOBDContrato.EntradaDatoOBD.ID_VIAJE + " INTEGER NOT NULL,"
+                + "UNIQUE (" + DatoOBDContrato.EntradaDatoOBD.ID_VALOR_EXPORT + "))");
+
+        //creacion de tabla
+        sqLiteDatabase.execSQL("CREATE TABLE " + DatoOBDContrato.EntradaDatoOBD.TABLE_VIAJES + " ("
+                + DatoOBDContrato.EntradaDatoOBD.ID_VIAJE_TABLE_VIAJE + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + DatoOBDContrato.EntradaDatoOBD.FECHA_VIAJE + " TEXT NOT NULL,"
+                + DatoOBDContrato.EntradaDatoOBD.COCHE_VIAJE + " TEXT NOT NULL,"
+                + "UNIQUE (" + DatoOBDContrato.EntradaDatoOBD.ID_VIAJE_TABLE_VIAJE + "))");
+
+        //creacion de tabla
+        sqLiteDatabase.execSQL("CREATE TABLE " + DatoOBDContrato.EntradaDatoOBD.TABLE_BACHES + " ("
+                + DatoOBDContrato.EntradaDatoOBD.ID_ACELARACION_BACHE + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + DatoOBDContrato.EntradaDatoOBD.GRUPO_ACELERACION_BACHE + " INTEGER NOT NULL,"
+                + "UNIQUE (" + DatoOBDContrato.EntradaDatoOBD.ID_ACELARACION_BACHE + "))");
     }
 
     @Override
@@ -576,20 +632,19 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
 
         //creacion de tabla
         sqLiteDatabase.execSQL("CREATE TABLE " + DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE + " ("
-                + DatoOBDContrato.EntradaDatoOBD.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION + " TEXT NOT NULL,"
+                + DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION + " TEXT PRIMARY KEY,"
                 + DatoOBDContrato.EntradaDatoOBD.MARCA + " TEXT NOT NULL,"
                 + DatoOBDContrato.EntradaDatoOBD.MODELO + " TEXT NOT NULL,"
                 + DatoOBDContrato.EntradaDatoOBD.YEAR + " TEXT NOT NULL,"
                 + DatoOBDContrato.EntradaDatoOBD.CONFIGURACION_ACTIVA + " INTEGER NOT NULL,"
-                + "UNIQUE (" + DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION + "))");
+                + "UNIQUE (" + DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION + "))");
 
 
         //insercion de datos
         ContentValues values= new ContentValues();
 
         // Pares clave-valor
-        values.put(DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION, "Predeterminada");
+        values.put(DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION, "Predeterminada");
         values.put(DatoOBDContrato.EntradaDatoOBD.MARCA, "Alfa Romeo");
         values.put(DatoOBDContrato.EntradaDatoOBD.MODELO, "Giulia");
         values.put(DatoOBDContrato.EntradaDatoOBD.YEAR, "2018");
@@ -1282,25 +1337,8 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
         return temperatura;
     }
 
-    public HashMap<String, Boolean> consultarPreferenciasDatosViajeDisponibilidad() {
-        HashMap<String, Boolean> datosViaje =  new HashMap<>();
-        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-        String configuracion = cargarConfiguracionCoche();
 
-        String query = "select * from " + DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE + " WHERE tipoDato=? and "+DatoOBDContrato.EntradaDatoOBD.NOMBRE_CONFIGURACION+"=?";
-        Cursor consulta = sqLiteDatabase.rawQuery(query, new String[]{"datosViaje", configuracion});
-        while(consulta.moveToNext()){
-            @SuppressLint("Range") String nombreDato = consulta.getString(consulta.getColumnIndex(DatoOBDContrato.EntradaDatoOBD.NOMBRE_DATO));
-            @SuppressLint("Range") Integer disponibilidad = Integer.parseInt(consulta.getString(consulta.getColumnIndex(DatoOBDContrato.EntradaDatoOBD.DISPONIBLE)));
-            Boolean disponibilidad1 = disponibilidad.equals(1);
-            datosViaje.put(nombreDato, disponibilidad1);
-        }
-        return datosViaje;
-    }
-
-
-
-    public void guardarPreferencias(HashMap<String, Boolean> motor, HashMap<String, Boolean> presion, HashMap<String, Boolean> combustible, HashMap<String, Boolean> temperatura, HashMap<String, Boolean> datosViaje){
+    public void guardarPreferencias(HashMap<String, Boolean> motor, HashMap<String, Boolean> presion, HashMap<String, Boolean> combustible, HashMap<String, Boolean> temperatura){
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         boolean activado;
         int valor;
@@ -1327,7 +1365,7 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
                 valor = 0;
             }
             cont.put(DatoOBDContrato.EntradaDatoOBD.ACTIVADO, valor);
-            int consulta = sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, cont, "nombreDato=? and "+DatoOBDContrato.EntradaDatoOBD.NOMBRE_CONFIGURACION+"=?", new String[] {clave});
+            int consulta = sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, cont, "nombreDato=? and "+DatoOBDContrato.EntradaDatoOBD.NOMBRE_CONFIGURACION+"=?", new String[] {clave, configuracion});
         }
 
         for (String clave:combustible.keySet()) {
@@ -1339,7 +1377,7 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
                 valor = 0;
             }
             cont.put(DatoOBDContrato.EntradaDatoOBD.ACTIVADO, valor);
-            int consulta = sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, cont, "nombreDato=? and "+DatoOBDContrato.EntradaDatoOBD.NOMBRE_CONFIGURACION+"=?", new String[] {clave});
+            int consulta = sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, cont, "nombreDato=? and "+DatoOBDContrato.EntradaDatoOBD.NOMBRE_CONFIGURACION+"=?", new String[] {clave, configuracion});
         }
 
         for (String clave:temperatura.keySet()) {
@@ -1351,23 +1389,13 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
                 valor = 0;
             }
             cont.put(DatoOBDContrato.EntradaDatoOBD.ACTIVADO, valor);
-            int consulta = sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, cont, "nombreDato=? and "+DatoOBDContrato.EntradaDatoOBD.NOMBRE_CONFIGURACION+"=?", new String[] {clave});
+            int consulta = sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, cont, "nombreDato=? and "+DatoOBDContrato.EntradaDatoOBD.NOMBRE_CONFIGURACION+"=?", new String[] {clave, configuracion});
         }
 
-        for (String clave:datosViaje.keySet()) {
-            ContentValues cont = new ContentValues();
-            activado = datosViaje.get(clave);
-            if(activado){
-                valor = 1;
-            } else{
-                valor = 0;
-            }
-            cont.put(DatoOBDContrato.EntradaDatoOBD.ACTIVADO, valor);
-            int consulta = sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, cont, "nombreDato=? and "+DatoOBDContrato.EntradaDatoOBD.NOMBRE_CONFIGURACION+"=?", new String[] {clave});
-        }
+
     }
 
-    public void actualizarDisponibilidad(HashMap<String, Boolean> motor, HashMap<String, Boolean> presion, HashMap<String, Boolean> combustible, HashMap<String, Boolean> temperatura, HashMap<String, Boolean> datosViaje){
+    public void actualizarDisponibilidad(HashMap<String, Boolean> motor, HashMap<String, Boolean> presion, HashMap<String, Boolean> combustible, HashMap<String, Boolean> temperatura){
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         boolean valor;
         int disp=0;
@@ -1424,17 +1452,6 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
             int consulta = sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, cont, "nombreDato=? and "+DatoOBDContrato.EntradaDatoOBD.NOMBRE_CONFIGURACION+"=?", new String[] {clave, configuracion});
         }
 
-        for (String clave:datosViaje.keySet()) {
-            ContentValues cont = new ContentValues();
-            valor = datosViaje.get(clave);
-            if(valor){
-                disp = 1;
-            }else{
-                disp = 0;
-            }
-            cont.put(DatoOBDContrato.EntradaDatoOBD.DISPONIBLE, disp);
-            int consulta = sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, cont, "nombreDato=? and "+DatoOBDContrato.EntradaDatoOBD.NOMBRE_CONFIGURACION+"=?", new String[] {clave, configuracion});
-        }
     }
 
 
@@ -1487,7 +1504,7 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
         String query = "select * from " + DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE + " WHERE activada=1";
         Cursor consulta = sqLiteDatabase.rawQuery(query,null);
         while(consulta.moveToNext()){
-            configuracionCoche = consulta.getString(consulta.getColumnIndex(DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION));
+            configuracionCoche = consulta.getString(consulta.getColumnIndex(DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION));
         }
         return configuracionCoche;
     }
@@ -1503,27 +1520,27 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
         cont.put(DatoOBDContrato.EntradaDatoOBD.MODELO, modelo);
         cont.put(DatoOBDContrato.EntradaDatoOBD.YEAR, year);
 
-        sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE, cont, DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION+"='"+nombreConfiguracion+"'", null);
+        sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE, cont, DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION +"='"+nombreConfiguracion+"'", null);
     }
 
     public void desactivarConfiguracionActiva(String nombreConfiguracion){
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         ContentValues cont = new ContentValues();
         cont.put(DatoOBDContrato.EntradaDatoOBD.CONFIGURACION_ACTIVA, 0);
-        sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE, cont, DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION+"='"+nombreConfiguracion+"'", null);
+        sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE, cont, DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION +"='"+nombreConfiguracion+"'", null);
     }
 
     public void activarConfiguracion(String nombreConfiguracion){
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         ContentValues cont = new ContentValues();
         cont.put(DatoOBDContrato.EntradaDatoOBD.CONFIGURACION_ACTIVA, 1);
-        sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE, cont, DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION+"='"+nombreConfiguracion+"'", null);
+        sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE, cont, DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION +"='"+nombreConfiguracion+"'", null);
     }
 
     public void borrarConfiguracion(String nombreConfiguracion){
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-        sqLiteDatabase.delete(DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE, DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION+"=?", new String[]{nombreConfiguracion});
-        sqLiteDatabase.delete(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION+"=?", new String[]{nombreConfiguracion});
+        sqLiteDatabase.delete(DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE, DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION +"=?", new String[]{nombreConfiguracion});
+        sqLiteDatabase.delete(DatoOBDContrato.EntradaDatoOBD.OBD_PREFERENCIAS_TABLE, DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION +"=?", new String[]{nombreConfiguracion});
 
     }
 
@@ -1532,10 +1549,10 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         String name=null;
 
-        String query = "select * from " + DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE + " WHERE "+DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION+"='"+nombreConfiguracion+"'";
+        String query = "select * from " + DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE + " WHERE "+DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION +"='"+nombreConfiguracion+"'";
         Cursor consulta = sqLiteDatabase.rawQuery(query, null);
         while(consulta.moveToNext()){
-            name = consulta.getString(consulta.getColumnIndex(DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION));
+            name = consulta.getString(consulta.getColumnIndex(DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION));
         }
         if(name==null){
             return false;
@@ -1552,7 +1569,7 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
         String query = "select * from " + DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE;
         Cursor consulta = sqLiteDatabase.rawQuery(query, null);
         while(consulta.moveToNext()){
-            nombreConfiguracion = consulta.getString(consulta.getColumnIndex(DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION));
+            nombreConfiguracion = consulta.getString(consulta.getColumnIndex(DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION));
             lista.add(nombreConfiguracion);
         }
         return lista;
@@ -1562,7 +1579,7 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         boolean activo = false;
 
-        String query = "select * from " + DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE + " WHERE "+DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION+"='"+nombreConfiguracion+"'";
+        String query = "select * from " + DatoOBDContrato.EntradaDatoOBD.DATOS_COCHE_TABLE + " WHERE "+DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION +"='"+nombreConfiguracion+"'";
         Cursor consulta = sqLiteDatabase.rawQuery(query, null);
         while(consulta.moveToNext()){
             @SuppressLint("Range") int activado = consulta.getInt(consulta.getColumnIndex(DatoOBDContrato.EntradaDatoOBD.CONFIGURACION_ACTIVA));
@@ -1586,6 +1603,26 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
 
         // Insertar...
         sqLiteDatabase.insert(DatoOBDContrato.EntradaDatoOBD.ESTADISTICAS_TABLA, null, values);
+    }
+
+    public void modifyTiempoTotalEncendido(float valor){
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        ContentValues cont = new ContentValues();
+        cont.put(DatoOBDContrato.EntradaDatoOBD.VALOR, valor);
+        sqLiteDatabase.update(DatoOBDContrato.EntradaDatoOBD.ESTADISTICAS_TABLA, cont, DatoOBDContrato.EntradaDatoOBD.NOMBRE_ESTADISTICA+"='tiempoTotal'", null);
+    }
+
+    @SuppressLint("Range")
+    public float getTiempoTotalEstadisticas(){
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        float tiempo = 0;
+
+        String query = "select * from " + DatoOBDContrato.EntradaDatoOBD.ESTADISTICAS_TABLA + " WHERE "+DatoOBDContrato.EntradaDatoOBD.NOMBRE_ESTADISTICA+"='tiempoTotal'";
+        Cursor consulta = sqLiteDatabase.rawQuery(query, null);
+        while(consulta.moveToNext()){
+            tiempo = consulta.getFloat(consulta.getColumnIndex(DatoOBDContrato.EntradaDatoOBD.VALOR));
+        }
+        return tiempo;
     }
 
     public void insertTiempoTrasResetUsuario(float valor){
@@ -1779,14 +1816,16 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
             try
             {
                 file.createNewFile();
-                EscribirCSV csvWrite = new EscribirCSV(new FileWriter(file));
+                EscribirCSV csvWrite = null;
+                csvWrite = new EscribirCSV(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
+
                 SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-                Cursor curCSV = sqLiteDatabase.rawQuery("SELECT * FROM ExportTabla where idValor_viaje ='" + idViaje+"'",null);
+                Cursor curCSV = sqLiteDatabase.rawQuery("SELECT * FROM ExportTabla where idValorViaje ='" + idViaje+"'",null);
                 String tituloColumnas[] ={curCSV.getColumnName(0), curCSV.getColumnName(1), curCSV.getColumnName(2), curCSV.getColumnName(3)};
                 csvWrite.writeNext(tituloColumnas);
                 while(curCSV.moveToNext())
                 {
-                    //Which column you want to exprort
+                    //Which column you want to export
                     String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3)};
                     csvWrite.writeNext(arrStr);
                 }
@@ -1820,7 +1859,7 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         int cantidadAceleraciones=0;
 
-        String query = "select * from " + DatoOBDContrato.EntradaDatoOBD.TABLE_BACHES + " WHERE grupo_aceleracion_bache=" + grupo;
+        String query = "select * from " + DatoOBDContrato.EntradaDatoOBD.TABLE_BACHES + " WHERE grupoAceleracionBache=" + grupo;
         Cursor consulta = sqLiteDatabase.rawQuery(query, null);
         while(consulta.moveToNext()){
             cantidadAceleraciones++;
@@ -1833,7 +1872,7 @@ public class DatoOBDHelper extends SQLiteOpenHelper{
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(DatoOBDContrato.EntradaDatoOBD.ID_CONGIGURACION, nombreConfiguracion);
+        values.put(DatoOBDContrato.EntradaDatoOBD.ID_CONFIGURACION, nombreConfiguracion);
         values.put(DatoOBDContrato.EntradaDatoOBD.MARCA, marca);
         values.put(DatoOBDContrato.EntradaDatoOBD.MODELO, modelo);
         values.put(DatoOBDContrato.EntradaDatoOBD.YEAR, year);

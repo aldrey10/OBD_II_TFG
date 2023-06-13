@@ -13,6 +13,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
+        android:editable="false"
         android:minHeight="48dp"
         android:text="Ya existen actualmente grabaciones en la Base de Datos. Recuerda que las puede consultar, exportar o borrar en la ventana de Exportaciones"
         android:textAlignment="center" />

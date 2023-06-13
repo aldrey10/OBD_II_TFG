@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#256A87"
-    tools:context=".ui.ExportacionActivity">
+    tools:context=".ui.exportaciones.ExportacionActivity">
 
     <Button
         android:id="@+id/btnExportar"

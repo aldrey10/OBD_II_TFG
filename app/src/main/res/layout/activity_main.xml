@@ -50,7 +50,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imgRegistros"
         app:layout_constraintTop_toBottomOf="@+id/imgVisualizarDatos"
-        app:srcCompat="@drawable/ic_action_verpardatos"
+        app:srcCompat="@drawable/ic_action_registro"
         tools:visibility="visible" />
 
     <ImageButton
@@ -84,7 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="120dp"
         android:foregroundTint="#FFFFFFFF"
-        android:text="Registros"
+        android:text="Estadísticas y Baches"
         android:textColor="#FFFFFFFF"
         app:drawableTint="@color/white"
         app:layout_constraintEnd_toEndOf="@id/imgRegistros"
@@ -107,7 +107,7 @@
         tools:ignore="TouchTargetSizeCheck" />
 
     <LinearLayout
-        android:id="@+id/snackbar"
+        android:id="@+id/snackbar_preferencias"
         android:layout_width="354dp"
         android:layout_height="140dp"
         android:layout_marginStart="4dp"
@@ -127,7 +127,7 @@
             android:visibility="gone" />
 
         <TextView
-            android:id="@+id/snackbar_text"
+            android:id="@+id/snackbar_text_preferencias"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -210,7 +210,7 @@
         app:layout_constraintStart_toEndOf="@+id/imgConfiguracion"
         app:layout_constraintTop_toTopOf="parent"
 
-        app:srcCompat="@drawable/ic_action_registro"
+        app:srcCompat="@drawable/ic_action_verpardatos"
         tools:visibility="visible" />
 
     <TextView
@@ -218,7 +218,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="120dp"
-        android:text="Ver Datos"
+        android:text="Ver Datos en Visores"
         android:textColor="#FFFFFFFF"
         app:layout_constraintEnd_toEndOf="@id/imgVisualizarDatos"
         app:layout_constraintStart_toStartOf="@id/imgVisualizarDatos"

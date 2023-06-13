@@ -1,4 +1,4 @@
-package com.tfg.obdTFG.ui.configuracion.opcionesconf;
+package com.tfg.obdTFG.ui.configuracion.DatosCoche;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.tfg.obdTFG.Bluetooth;
+import com.tfg.obdTFG.bluetooth.Bluetooth;
 import com.tfg.obdTFG.MainActivity;
 import com.tfg.obdTFG.R;
 import com.tfg.obdTFG.db.DatoOBDHelper;
@@ -343,7 +343,7 @@ public class DatosCocheActivity extends AppCompatActivity implements CambiarConf
     }
 
     public void mostrarSnackBarMsg(String mensaje){
-        Snackbar.make(findViewById(R.id.snackbar), mensaje, 5000).show();
+        Snackbar.make(findViewById(R.id.snackbar_preferencias), mensaje, 5000).show();
     }
 
 

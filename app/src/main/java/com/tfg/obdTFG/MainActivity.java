@@ -1,7 +1,6 @@
 package com.tfg.obdTFG;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -13,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,32 +24,36 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.tfg.obdTFG.acelerometros.ServiceStates;
+import com.tfg.obdTFG.acelerometros.ServicioAcelerometros;
+import com.tfg.obdTFG.bluetooth.Bluetooth;
 import com.tfg.obdTFG.databinding.ActivityMainBinding;
 import com.tfg.obdTFG.db.DatoOBDHelper;
-import com.tfg.obdTFG.ui.configuracion.opcionesconf.CrearConfiguracionCocheFragment;
-import com.tfg.obdTFG.ui.verdatos.EstadisticasActivity;
-import com.tfg.obdTFG.ui.verdatos.VerDatosParDatoValorActivity;
-import com.tfg.obdTFG.ui.verdatos.VerDatosVisoresActivity;
+import com.tfg.obdTFG.ui.configuracion.Preferencias.PreferenciasActivity;
+import com.tfg.obdTFG.ui.configuracion.DatosCoche.CrearConfiguracionCocheFragment;
+import com.tfg.obdTFG.ui.exportaciones.ExportacionActivity;
+import com.tfg.obdTFG.ui.verdatos.CodigoDatos;
+import com.tfg.obdTFG.ui.verdatos.VerEstadisticas.EstadisticasActivity;
+import com.tfg.obdTFG.ui.verdatos.VerDatoParValor.VerDatosParDatoValorActivity;
+import com.tfg.obdTFG.ui.verdatos.VerVisores.VerDatosVisoresActivity;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements MostrarConfiguracionesFragment.MostrarConf, ResumenConfiguracionFragment.GestionConfiguracion, PreguntarGrabacionFragment.PreguntarGrabacion {
 
-    public ViewModel viewmodel;
+    public MainViewModel viewModel;
     public static Menu menu;
     private ActivityMainBinding binding;
 
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
     private static int REQUEST_WRITE_EXTERNAL_STORAGE = 2;
 
     public static Bluetooth bluetooth;
+    public DatoOBDHelper database;
     public static boolean primeraVezVerDatos = true;
     public static boolean cocheEncendido = false;
     //public static boolean primeraVezPreferencias = true;
@@ -117,26 +120,37 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
     public static final int SNACKBAR_MSG_CONEXION_FALLIDA = 7;
     public static final int MESSAGE_WRITE = 8;
 
+    public static final String MESSAGE_READ_STRING = "1";
+    public static final String MESSAGE_DEVICE_NAME_STRING = "2";
+    public static final String BLUETOOTH_ACTIVADO_STRING = "3";
+    public static final String ASK_BLUETOOTH_STRING = "4";
+    public static final String SNACKBAR_MSG_STRING = "5";
+    public static final String PEDIR_COMANDOS_STRING = "6";
+    public static final String SNACKBAR_MSG_CONEXION_FALLIDA_STRING = "7";
+    public static final String MESSAGE_WRITE_STRING = "8";
+
 
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
     public static final String MENSAJE_SNACKBAR = "mensaje_Snackbar";
     public static final String COMANDOS = "mis_comandos";
 
+    private HashMap<String, Boolean> motor;
+    private HashMap<String, Boolean> presion;
+    private HashMap<String, Boolean> combustible;
+    private HashMap<String, Boolean> temperatura;
 
-    public static final String[] listComands = new String[]{"010C", "010D", "0110", "0104", "015C", "0133", "010A", "0123", "010B", "0132", "012F", "0151", "015E", "0144",
-            "0146", "0105", "010F", "013C", "011F", "0111", "0121", "012C", "012D", "012E", "0130", "0131", "0142", "015D", "0161", "0162", "0163"};
+    public static boolean huboCambiosPreferencias = false;
+
     public static ArrayList<String> comandos = new ArrayList<>();
     private final String[] tiposComandos = new String[]{"ATDP", "ATS0", "ATL0", "ATAT0", "ATST10", "ATSPA0", "ATE0"};
-    private int comandoAElegir = 0;
+    public static int comandoAElegir = 0;
 
     private String msgTemporal;
 
     private int rpmval = 0, currenttemp = 0, Enginedisplacement = 1500, Enginetype = 0, FaceColor = 0;
     private ArrayList<Double> avgconsumption;
     private TextView Speed, RPM, Load, Fuel, Volt, Temp, Loadtext, Volttext, Temptext, Centertext;
-
-    private DatoOBDHelper database;
 
     private ServiceStates srvStatus;
 
@@ -148,19 +162,25 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        viewmodel = new ViewModel();
 
         //Creamos o obtenemos la base de datos
         database = new DatoOBDHelper(this);
         database.getWritableDatabase();
-        database.deleteTablaBachesInit();
+
+        viewModel = new MainViewModel(database);
         //database.hola();
+
         //database.establecerForeignKeyON();
+
+        viewModel.deleteTablaBachesInit();
+        viewModel.resetValoresTablaEstadisticas();
+        viewModel.insertValuesEstadisticasDB("tiempoMotorEncendido", 0);
+        viewModel.insertValuesEstadisticasDB("tiempoTotal", 0);
+
         // cogemos el adaptador Bluetooth de nuestro dispositivo
         btAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        ArrayList<String> stringList = new ArrayList<String>(Arrays.asList(listComands));
-        comandos = stringList;
+        establecerCodigos();
 
 
         // Titulo de Dispositivos Bluetooth
@@ -188,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
                     btAdapter.cancelDiscovery();
 
                     // iniciamos la fase de conexion de Bluetooth con el dispositivo seleccionado
-                    bluetooth.iniciarHiloConnect(bluetoothDevice);
+                    viewModel.iniciarHiloConnect(bluetoothDevice);
                     View botonConectarse = (View) findViewById(R.id.btnConectarse);
                     botonConectarse.setVisibility(View.INVISIBLE);
                     TextView conectandonos = (TextView) findViewById(R.id.txtConectandonos);
@@ -213,6 +233,69 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
         handlerThreadVerParDatoValor.start();
         looperVerParDatoValor = handlerThreadVerParDatoValor.getLooper();*/
 
+        //viewModel.setEstamosEnViewModelMain(true);
+
+        final Observer<ArrayList<String>> observer = new Observer<ArrayList<String>>() {
+            @Override
+            public void onChanged(ArrayList<String> misDatos) {
+                //mostrarDatos(misDatos);
+                switch (misDatos.get(0)) {
+                    case MESSAGE_WRITE_STRING:
+                        break;
+                    case PEDIR_COMANDOS_STRING:
+                        // lista de comandos que se mandan a OBD II, es decir, lista de datos que queremos saber (velocidad, RPM, etc)
+                        pedirComandos();
+                        break;
+                    case MESSAGE_READ_STRING:
+                        // interpretamos el mensaje que nos manda el OBD II (el valor)
+                        interpretarMensaje(misDatos.get(1));
+                        break;
+                    case MESSAGE_DEVICE_NAME_STRING:
+                        // guardamos el nombre del dispositivo conectado
+                        nombreDispositivoConectado = misDatos.get(1);
+                        break;
+                    case BLUETOOTH_ACTIVADO_STRING:
+                        // mostrar los dispositivos Bluetooth cercanos a los que podemos conectarnos
+                        activarListaDispositivosBluetooth();
+                        break;
+                    case ASK_BLUETOOTH_STRING:
+                        // solicitar activar el Bluetooth
+                        askForBluetooth();
+                        break;
+                    case SNACKBAR_MSG_STRING:
+                        // mostrar el nombre del dispositivo conectado como un mensaje de Snackbar
+                        mostrarSnackBarMsg(misDatos.get(1));
+                        mostrarDispositivoConectado(nombreDispositivoConectado);
+                        viewModel.setNombreDispositivo(nombreDispositivoConectado);
+                        mostrarMenu();
+                        View botonCancelar = (View) findViewById(R.id.btnCancelar);
+                        botonCancelar.setVisibility(View.INVISIBLE);
+                        viewModel.setEstamosEnViewModelMain(true);
+                        viewModel.iniciarTransferenciaDatosVisores();
+                        pedirComandos();
+                        ImageButton btnRegistroDatos = findViewById(R.id.btnGrabacionDatos);
+                        btnRegistroDatos.setClickable(true);
+                        btnRegistroDatos.setBackgroundTintList(getResources().getColorStateList(R.color.opcionMenuActiva));
+
+                        startService();
+                        break;
+                    case SNACKBAR_MSG_CONEXION_FALLIDA_STRING:
+                        mostrarSnackBarMsg(misDatos.get(1));
+                        View listaDispositivos = (View) findViewById(R.id.listaDispositivosBluetooth);
+                        listaDispositivos.setVisibility(View.INVISIBLE);
+                        TextView conectandonos = (TextView) findViewById(R.id.txtConectandonos);
+                        conectandonos.setVisibility(View.INVISIBLE);
+                        View botonConectarse = (View) findViewById(R.id.btnConectarse);
+                        botonConectarse.setVisibility(View.VISIBLE);
+                        View botonCancel = (View) findViewById(R.id.btnCancelar);
+                        botonCancel.setVisibility(View.INVISIBLE);
+                        mostrarMenu();
+                        break;
+                }
+            }
+        };
+        viewModel.getMiDato().observe(this, observer);
+
 
     }
 
@@ -226,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
         // change color for icon 0
         Drawable yourdrawable = menu.getItem(0).getIcon();
         if (bluetooth!=null){
-            if(bluetooth.getEstado()==Bluetooth.STATE_CONECTADOS){
+            if(viewModel.getBluetoothEstado()){
                 yourdrawable.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.SRC_IN);
             }else{
                 yourdrawable.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_IN);
@@ -259,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
     @Override
     protected void onResume() {
         super.onResume();
-        existeGrabacionEnBD = database.existenDatosAExportar();
+        existeGrabacionEnBD = viewModel.existenDatosAExportar();
         if(existeGrabacionEnBD){
             ImageButton btnExportar = findViewById(R.id.btnExportacion);
             btnExportar.setBackgroundTintList(getResources().getColorStateList(R.color.opcionMenuActiva));
@@ -269,16 +352,15 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
             btnExportar.setBackgroundTintList(getResources().getColorStateList(R.color.opcionMenuDesactiva));
             btnExportar.setClickable(false);
         }
-        this.btSocket = viewmodel.getConexionBluetooth();
+        this.btSocket = viewModel.getBtSocket();
         if (btSocket != null) {
             //this.btAdapter = viewmodel.getBtAdapter();
-            this.bluetooth = viewmodel.getBluetooth();
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     //requestPermissions(Android_Permissions, 1);
                 }
             }
-            this.nombreDispositivoConectado = viewmodel.getNombreDispositivo();
+            this.nombreDispositivoConectado = viewModel.getNombreDispositivo();
         }
         if (this.nombreDispositivoConectado != null) {
             mostrarDispositivoConectado(nombreDispositivoConectado);
@@ -288,11 +370,14 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
         comprobarCocheEncendido();
         ImageButton btnRegistroDatos = findViewById(R.id.btnGrabacionDatos);
         if(bluetooth!=null) {
-            if (bluetooth.getEstado() == Bluetooth.STATE_CONECTADOS) {
+            if (viewModel.getBluetoothEstado()) {
                 btnRegistroDatos.setVisibility(View.VISIBLE);
             }
         }
 
+        if(bluetooth!=null){
+            viewModel.setEstamosEnViewModelMain(true);
+        }
         startService();
 
     }
@@ -313,6 +398,109 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
         }
     } //onActivityResult
 
+    public void establecerCodigos(){
+        motor = viewModel.consultarPreferenciasMotor();
+        if(Objects.equals(motor.get("Velocidad del vehículo"), true)){
+            comandos.add(CodigoDatos.VelocidadVehiculo.getCodigo());
+        }
+        if(Objects.equals(motor.get("Revoluciones por minuto"), true)){
+            comandos.add(CodigoDatos.RPM.getCodigo());
+        }
+        if(Objects.equals(motor.get("Velocidad del flujo del aire MAF"), true)){
+            comandos.add(CodigoDatos.VelocidadFlujoAire.getCodigo());
+        }
+        if(Objects.equals(motor.get("Carga calculada del motor"), true)){
+            comandos.add(CodigoDatos.CargaCalculadaMotor.getCodigo());
+        }
+        if(Objects.equals(motor.get("Temperatura del aceite del motor"), true)){
+            comandos.add(CodigoDatos.TempAceiteMotor.getCodigo());
+        }
+        if(Objects.equals(motor.get("Posición del acelerador"), true)){
+            comandos.add(CodigoDatos.PosicionAcelerador.getCodigo());
+        }
+        if(Objects.equals(motor.get("Porcentaje torque solicitado"), true)){
+            comandos.add(CodigoDatos.PorcentajeTorqueSolicitado.getCodigo());
+        }
+        if(Objects.equals(motor.get("Porcentaje torque actual"), true)){
+            comandos.add(CodigoDatos.PorcentajeTorqueActual.getCodigo());
+        }
+        if(Objects.equals(motor.get("Torque referencia motor"), true)){
+            comandos.add(CodigoDatos.TorqueReferenciaMotor.getCodigo());
+        }
+        if(Objects.equals(motor.get("Voltaje módulo control"), true)){
+            comandos.add(CodigoDatos.VoltajeModuloControl.getCodigo());
+        }
+
+        presion = viewModel.consultarPreferenciasPresion();
+        if(Objects.equals(presion.get("Presión barométrica absoluta"), true)){
+            comandos.add(CodigoDatos.PresionBarometricaAbsoluta.getCodigo());
+        }
+        if(Objects.equals(presion.get("Presión del combustible"), true)){
+            comandos.add(CodigoDatos.PresionCombustible.getCodigo());
+        }
+        if(Objects.equals(presion.get("Presión medidor tren combustible"), true)){
+            comandos.add(CodigoDatos.PresionMedidorTrenCombustible.getCodigo());
+        }
+        if(Objects.equals(presion.get("Presion absoluta colector admisión"), true)){
+            comandos.add(CodigoDatos.PresionAbsColectorAdmision.getCodigo());
+        }
+        if(Objects.equals(presion.get("Presión del vapor del sistema evaporativo"), true)){
+            comandos.add(CodigoDatos.PresionVaporSisEvaporativo.getCodigo());
+        }
+
+
+        combustible = viewModel.consultarPreferenciasCombustible();
+        if(Objects.equals(combustible.get("Nivel de combustible %"), true)){
+            comandos.add(CodigoDatos.NivelCombustible.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Tipo de combustible"), true)){
+            comandos.add(CodigoDatos.TipoCombustibleNombre.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Velocidad consumo de combustible"), true)){
+            comandos.add(CodigoDatos.VelocidadConsumoCombustible.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Relación combustible-aire"), true)){
+            comandos.add(CodigoDatos.RelacionCombustibleAire.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Distancia con luz fallas encendida"), true)){
+            comandos.add(CodigoDatos.DistanciaLuzEncendidaFalla.getCodigo());
+        }
+        if(Objects.equals(combustible.get("EGR comandado"), true)){
+            comandos.add(CodigoDatos.EGRComandado.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Falla EGR"), true)){
+            comandos.add(CodigoDatos.FallaEGR.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Purga evaporativa comandada"), true)){
+            comandos.add(CodigoDatos.PurgaEvaporativaComand.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Cant. calentamiento sin fallas"), true)){
+            comandos.add(CodigoDatos.CantidadCalentamientosDesdeNoFallas.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Distancia sin luz fallas encendida"), true)){
+            comandos.add(CodigoDatos.DistanciaRecorridadSinLuzFallas.getCodigo());
+        }
+        if(Objects.equals(combustible.get("Sincronización inyección combustible"), true)){
+            comandos.add(CodigoDatos.SincroInyeccionCombustible.getCodigo());
+        }
+
+
+        temperatura = viewModel.consultarPreferenciasTemperatura();
+        if(Objects.equals(temperatura.get("Temperatura del aire ambiente"), true)){
+            comandos.add(CodigoDatos.TempAireAmbiente.getCodigo());
+        }
+        if(Objects.equals(temperatura.get("Tº del líquido de enfriamiento"), true)){
+            comandos.add(CodigoDatos.TempLiquidoEnfriamiento.getCodigo());
+        }
+        if(Objects.equals(temperatura.get("Tº del aire del colector de admisión"), true)){
+            comandos.add(CodigoDatos.TempAireColectorAdmision.getCodigo());
+        }
+        if(Objects.equals(temperatura.get("Temperatura del catalizador"), true)){
+            comandos.add(CodigoDatos.TempCatalizador.getCodigo());
+        }
+
+
+    }
 
     private final Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -350,14 +538,13 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
                     mostrarMenu();
                     View botonCancelar = (View) findViewById(R.id.btnCancelar);
                     botonCancelar.setVisibility(View.INVISIBLE);
-                    bluetooth.iniciarTransferenciaDatosVisores();
+                    viewModel.iniciarTransferenciaDatosVisores();
                     pedirComandos();
                     ImageButton btnRegistroDatos = findViewById(R.id.btnGrabacionDatos);
                     btnRegistroDatos.setClickable(true);
                     btnRegistroDatos.setBackgroundTintList(getResources().getColorStateList(R.color.opcionMenuActiva));
 
-                    viewmodel.setConexionBluetooth(bluetooth.getMmSocket());
-                    viewmodel.setNombreDispositivo(nombreDispositivoConectado);
+                    startService();
                     break;
                 case SNACKBAR_MSG_CONEXION_FALLIDA:
                     mostrarSnackBarMsg(msg.getData().getString(MENSAJE_SNACKBAR));
@@ -495,9 +682,9 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
         switch (msgTemporal) {
             case "410D": {
                 if(estamosCapturando) {
-                    database.insertDBExport("Velocidad del vehículo", obdval);
+                    viewModel.insertDBExport("Velocidad del vehículo", obdval);
                 }
-                database.insertValuesEstadisticasDB("Velocidad del vehículo", (float) obdval);
+                viewModel.insertValuesEstadisticasDB("Velocidad", (float) obdval);
                 break;
             }
             case "410C": {
@@ -505,98 +692,98 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
                 cocheEncendido = true;
                 comprobarCocheEncendido();
                 if(estamosCapturando) {
-                    database.insertDBExport("Revoluciones por minuto", val);
+                    viewModel.insertDBExport("Revoluciones por minuto", val);
                 }
-                database.insertValuesEstadisticasDB("Revoluciones por minuto", val);
+                viewModel.insertValuesEstadisticasDB("Revoluciones", val);
                 break;
             }
             case "4110": {
                 float val = (float) (obdval / 100);
                 if(estamosCapturando) {
-                    database.insertDBExport("Velocidad del flujo del aire MAF", val);
+                    viewModel.insertDBExport("Velocidad del flujo del aire MAF", val);
                 }
                 break;
             }
             case "4104": {
                 float val = (float) (obdval / 2.55);
                 if(estamosCapturando) {
-                    database.insertDBExport("Carga calculada del motor", val);
+                    viewModel.insertDBExport("Carga calculada del motor", val);
                 }
                 break;
             }
             case "415C": {
                 float val = (float) (obdval - 40);
                 if(estamosCapturando) {
-                    database.insertDBExport("Temperatura del aceite del motor", val);
+                    viewModel.insertDBExport("Temperatura del aceite del motor", val);
                 }
                 break;
             }
             case "4111": {
                 float val = (float) (obdval/2.55);
                 if(estamosCapturando) {
-                    database.insertDBExport("Posición del acelerador", val);
+                    viewModel.insertDBExport("Posición del acelerador", val);
                 }
                 break;
             }
             case "4161": {
                 float val = (float) (obdval - 125);
                 if(estamosCapturando) {
-                    database.insertDBExport("Porcentaje torque solicitado", val);
+                    viewModel.insertDBExport("Porcentaje torque solicitado", val);
                 }
                 break;
             }
             case "4162": {
                 float val = (float) (obdval - -125);
                 if(estamosCapturando) {
-                    database.insertDBExport("Porcentaje torque actual", val);
+                    viewModel.insertDBExport("Porcentaje torque actual", val);
                 }
                 break;
             }
             case "4163": {
                 float val = (float) (obdval);
                 if(estamosCapturando) {
-                    database.insertDBExport("Torque referencia motor", val);
+                    viewModel.insertDBExport("Torque referencia motor", val);
                 }
                 break;
             }
             case "4142": {
                 float val = (float) (obdval/1000);
                 if(estamosCapturando) {
-                    database.insertDBExport("Voltaje módulo control", val);
+                    viewModel.insertDBExport("Voltaje módulo control", val);
                 }
                 break;
             }
 
             case "4133": {
                 if(estamosCapturando) {
-                    database.insertDBExport("Presión barométrica absoluta", obdval);
+                    viewModel.insertDBExport("Presión barométrica absoluta", obdval);
                 }
                 break;
             }
             case "410A": {
                 float val = (float) (obdval * 3);
                 if(estamosCapturando) {
-                    database.insertDBExport("Presión del combustible", val);
+                    viewModel.insertDBExport("Presión del combustible", val);
                 }
                 break;
             }
             case "4123": {
                 float val = (float) (obdval * 10);
                 if(estamosCapturando) {
-                    database.insertDBExport("Presión medidor tren combustible", val);
+                    viewModel.insertDBExport("Presión medidor tren combustible", val);
                 }
                 break;
             }
             case "410B": {
                 if(estamosCapturando) {
-                    database.insertDBExport("Presion absoluta colector admisión", obdval);
+                    viewModel.insertDBExport("Presion absoluta colector admisión", obdval);
                 }
                 break;
             }
             case "4132": {
                 float val = (float) ((obdval / 4) - 8192);
                 if(estamosCapturando) {
-                    database.insertDBExport("Presión del vapor del sistema evaporativo", val);
+                    viewModel.insertDBExport("Presión del vapor del sistema evaporativo", val);
                 }
                 break;
             }
@@ -604,77 +791,77 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
             case "412F": {
                 float val = (float) (obdval / 2.55);
                 if(estamosCapturando) {
-                    database.insertDBExport("Nivel de combustible %", val);
+                    viewModel.insertDBExport("Nivel de combustible %", val);
                 }
                 break;
             }
             case "4151": {
                 if(estamosCapturando) {
-                    database.insertDBExport("Tipo de combustible", obdval);
+                    viewModel.insertDBExport("Tipo de combustible", obdval);
                 }
                 break;
             }
             case "415E": {
                 float val = (float) (obdval / 20);
                 if(estamosCapturando) {
-                    database.insertDBExport("Velocidad consumo de combustible", val);
+                    viewModel.insertDBExport("Velocidad consumo de combustible", val);
                 }
-                database.insertValuesEstadisticasDB("Velocidad consumo de combustible", (float) val);
+                viewModel.insertValuesEstadisticasDB("Consumo", (float) val);
                 break;
             }
             case "4144": {
                 float val = (float) (obdval / 32768);
                 if(estamosCapturando) {
-                    database.insertDBExport("Relación combustible-aire", val);
+                    viewModel.insertDBExport("Relación combustible-aire", val);
                 }
                 break;
             }
             case "4121": {
                 float val = (float) (obdval);
                 if(estamosCapturando) {
-                    database.insertDBExport("Distancia con luz fallas encendida", val);
+                    viewModel.insertDBExport("Distancia con luz fallas encendida", val);
                 }
                 break;
             }
             case "412C": {
                 float val = (float) (obdval / 2.55);
                 if(estamosCapturando) {
-                    database.insertDBExport("EGR comandado", val);
+                    viewModel.insertDBExport("EGR comandado", val);
                 }
                 break;
             }
             case "412D": {
                 float val = (float) ((obdval / 1.28) - 100);
                 if(estamosCapturando) {
-                    database.insertDBExport("Falla EGR", val);
+                    viewModel.insertDBExport("Falla EGR", val);
                 }
                 break;
             }
             case "412E": {
                 float val = (float) (obdval / 2.55);
                 if(estamosCapturando) {
-                    database.insertDBExport("Purga evaporativa comandada", val);
+                    viewModel.insertDBExport("Purga evaporativa comandada", val);
                 }
                 break;
             }
             case "4130": {
                 float val = (float) (obdval);
                 if(estamosCapturando) {
-                    database.insertDBExport("Cant. calentamiento sin fallas", val);
+                    viewModel.insertDBExport("Cant. calentamiento sin fallas", val);
                 }
                 break;
             }
             case "4131": {
                 float val = (float) (obdval);
                 if(estamosCapturando) {
-                    database.insertDBExport("Distancia sin luz fallas encendida", val);
+                    viewModel.insertDBExport("Distancia sin luz fallas encendida", val);
                 }
                 break;
             }
             case "415D": {
                 float val = (float) ((obdval / 128) - 210);
                 if(estamosCapturando) {
-                    database.insertDBExport("Sincronización inyección combustible", val);
+                    viewModel.insertDBExport("Sincronización inyección combustible", val);
                 }
                 break;
             }
@@ -682,59 +869,52 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
             case "4146": {
                 float val = (float) (obdval - 40);
                 if(estamosCapturando) {
-                    database.insertDBExport("Temperatura del aire ambiente", val);
+                    viewModel.insertDBExport("Temperatura del aire ambiente", val);
                 }
                 break;
             }
             case "4105": {
                 float val = (float) (obdval - 40);
                 if(estamosCapturando) {
-                    database.insertDBExport("Tº del líquido de enfriamiento", val);
+                    viewModel.insertDBExport("Tº del líquido de enfriamiento", val);
                 }
                 break;
             }
             case "410F": {
                 float val = (float) (obdval - 40);
                 if(estamosCapturando) {
-                    database.insertDBExport("Tº del aire del colector de admisión", val);
+                    viewModel.insertDBExport("Tº del aire del colector de admisión", val);
                 }
                 break;
             }
             case "413C": {
                 float val = (float) ((obdval / 10) - 40);
                 if (estamosCapturando) {
-                    database.insertDBExport("Temperatura del catalizador", val);
+                    viewModel.insertDBExport("Temperatura del catalizador", val);
                 }
                 break;
             }
             case "411F": {
                 if (estamosCapturando) {
-                    database.insertDBExport("Tiempo con el motor encendido", obdval);
+                    viewModel.insertDBExport("Tiempo con el motor encendido", obdval);
                 }
-                database.insertValuesEstadisticasDB("Tiempo con el motor encendido", (float) obdval);
                 break;
             }
         }
 
-
-        send = comandos.get(comandoAElegir);
-        enviarMensajeADispositivo(send);
-        if (comandoAElegir >= comandos.size() - 1) {
-            comandoAElegir = 0;
-        } else {
-            comandoAElegir++;
+        if(!comandos.isEmpty()){
+            send = comandos.get(comandoAElegir);
+            enviarMensajeADispositivo(send);
+            if (comandoAElegir >= comandos.size() - 1) {
+                comandoAElegir = 0;
+            } else {
+                comandoAElegir++;
+            }
         }
 
 
     }
 
-    private double calculateAverage(ArrayList<Double> listavg) {
-        Double sum = 0.0;
-        for (Double val : listavg) {
-            sum += val;
-        }
-        return sum.doubleValue() / listavg.size();
-    }
 
     //comunicacion de mensajes con el vehiculo
     public void enviarMensajeADispositivo(String mensaje) {
@@ -742,7 +922,7 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
             mensaje = mensaje + "\r";
             // Get the message bytes and tell the BluetoothChatService to write
             byte[] send = mensaje.getBytes();
-            bluetooth.writeVisores(send);
+            viewModel.writeVisores(send);
         }
     }
 
@@ -769,9 +949,9 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
             setMenuInvisible();
             bluetoothEstaHabilitado = btAdapter.isEnabled();
             if (bluetoothEstaHabilitado) {
-                bluetooth = new Bluetooth(this, handler, btAdapter, viewmodel);
-                bluetooth.iniciarConexion();
-                viewmodel.setBluetooth(bluetooth);
+                bluetooth = new Bluetooth(this, handler, btAdapter, viewModel, database);
+                viewModel.setBluetooth(bluetooth);
+                viewModel.iniciarConexion();
                 //verDatos.setBluetooth(bluetooth);
                 View botonCancelar = (View) findViewById(R.id.btnCancelar);
                 botonCancelar.setVisibility(View.VISIBLE);
@@ -786,7 +966,7 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, Android_Permissions, 1);
         }
-        bluetooth.cancelarHiloConnect();
+        viewModel.cancelarHiloConnect();
         btAdapter.cancelDiscovery();
         View botonConectarse = (View) findViewById(R.id.btnConectarse);
         botonConectarse.setVisibility(View.VISIBLE);
@@ -799,6 +979,12 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
         mostrarMenu();
     }
 
+    protected void onPause() {
+        super.onPause();
+        if(bluetooth!=null){
+            viewModel.setEstamosEnViewModelMain(false);
+        }
+    }
 
     @Override
     protected void onDestroy() {
@@ -812,6 +998,9 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
         }
         catch (Exception e){
             System.out.println(e);;
+        }
+        if(bluetooth!=null){
+            viewModel.setEstamosEnViewModelMain(false);
         }
     }
 
@@ -844,7 +1033,7 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
 
 
     public void mostrarSnackBarMsg(String mensaje){
-        Snackbar.make(findViewById(R.id.snackbar), mensaje, 6000).show();
+        Snackbar.make(findViewById(R.id.snackbar_preferencias), mensaje, 6000).show();
     }
 
     public void mostrarDispositivoConectado(String mensaje){
@@ -924,7 +1113,7 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
                 if(!existeGrabacionEnBD){
                     estamosCapturando = true;
                     txtGrabar.setText("Parar Grabación");
-                    database.crearNuevoViaje();
+                    viewModel.crearNuevoViaje();
                     mostrarSnackBarMsg("Se ha comenzado la grabación de datos en Base de Datos. Pulse en \"Parar Grabacion\" para parar.");
                 }else{
                     new PreguntarGrabacionFragment().show(getSupportFragmentManager(), PreguntarGrabacionFragment.TAG);
@@ -947,7 +1136,7 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
     }
 
     public void exportarDatos(View view){
-        Intent intent = new Intent(MainActivity.this, com.tfg.obdTFG.ui.ExportacionActivity.class);
+        Intent intent = new Intent(MainActivity.this, ExportacionActivity.class);
         startActivity(intent);
         /*if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -978,7 +1167,7 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
         estamosCapturando=true;
         TextView txtExportar = findViewById(R.id.textGrabacion);
         txtExportar.setText("Parar Grabación");
-        database.crearNuevoViaje();
+        viewModel.crearNuevoViaje();
         mostrarSnackBarMsg("Se ha comenzado la grabación de datos en Base de Datos. Pulse en \"Parar Grabacion\" para parar.");
     }
 
@@ -1039,47 +1228,47 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
 
     @Override
     public void abrirPreferencias() {
-        Intent intent = new Intent(MainActivity.this, com.tfg.obdTFG.ui.configuracion.opcionesconf.PreferenciasActivity.class);
+        Intent intent = new Intent(MainActivity.this, PreferenciasActivity.class);
         startActivity(intent);
     }
 
     @Override
     public String consultarNombreConfiguracionActual() {
-        return database.cargarConfiguracionCoche();
+        return viewModel.cargarConfiguracionCoche();
     }
 
     @Override
     public String consultarMarcaActual() {
-        return database.cargarMarcaCoche();
+        return viewModel.cargarMarcaCoche();
     }
 
     @Override
     public String consultarModeloActual() {
-        return database.cargarModeloCoche();
+        return viewModel.cargarModeloCoche();
     }
 
     @Override
     public String consultarYearActual() {
-        return database.cargarYearCoche();
+        return viewModel.cargarYearCoche();
     }
 
     @Override
     public ArrayList<String> consultarTodasLasConfiguraciones() {
         ArrayList<String> lista = new ArrayList<>();
-        lista = database.consultarTodasLasConfiguraciones();
+        lista = viewModel.consultarTodasLasConfiguraciones();
         return lista;
     }
 
     @Override
     public boolean consultarConfiguracionActiva(String nombre) {
-        return database.consultarConfiguracionActiva(nombre);
+        return viewModel.consultarConfiguracionActiva(nombre);
     }
 
     @Override
     public void continuarConConfiguracion(String nombre) {
-        String confAntigua = database.cargarConfiguracionCoche();
-        database.desactivarConfiguracionActiva(confAntigua);
-        database.activarConfiguracion(nombre);
+        String confAntigua = viewModel.cargarConfiguracionCoche();
+        viewModel.desactivarConfiguracionActiva(confAntigua);
+        viewModel.activarConfiguracion(nombre);
         new ResumenConfiguracionFragment().show(getSupportFragmentManager(), CrearConfiguracionCocheFragment.TAG);
     }
 

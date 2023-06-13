@@ -3,7 +3,7 @@ package com.tfg.obdTFG.ui.verdatos;
 public enum CodigoDatos {
     VelocidadVehiculo("010D", "Velocidad del vehículo"),
     RPM("010C", "Revoluciones por minuto"),
-    VelocidadFlujoAire("1010", "Velocidad del flujo del aire MAF"),
+    VelocidadFlujoAire("0110", "Velocidad del flujo del aire MAF"),
     CargaCalculadaMotor("0104", "Carga calculada del motor"),
     TempAceiteMotor("015C", "Temperatura del aceite del motor"),
     PosicionAcelerador("0111", "Posición del acelerador"),

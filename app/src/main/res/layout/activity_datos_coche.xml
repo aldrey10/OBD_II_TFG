@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#256A87"
-    tools:context=".ui.configuracion.opcionesconf.DatosCocheActivity">
+    tools:context=".ui.configuracion.DatosCoche.DatosCocheActivity">
 
     <LinearLayout
-        android:id="@+id/snackbar"
+        android:id="@+id/snackbar_preferencias"
         android:layout_width="354dp"
         android:layout_height="140dp"
         android:orientation="vertical"
@@ -25,7 +25,7 @@
             android:visibility="gone" />
 
         <TextView
-            android:id="@+id/snackbar_text"
+            android:id="@+id/snackbar_text_preferencias"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

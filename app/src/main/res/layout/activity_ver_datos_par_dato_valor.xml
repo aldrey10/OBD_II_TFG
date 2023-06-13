@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#256A87"
-    tools:context=".ui.verdatos.VerDatosParDatoValorActivity">
+    tools:context=".ui.verdatos.VerDatoParValor.VerDatosParDatoValorActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerParDatoValor"
