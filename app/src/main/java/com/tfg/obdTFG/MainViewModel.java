@@ -80,6 +80,12 @@ public class MainViewModel {
         return false;
     }
 
+    public void setBluetoothEstado(int state){
+        if(bluetooth!=null){
+            bluetooth.setEstado(state);
+        }
+    }
+
     public void writeVisores(byte[] send){
         bluetooth.writeVisores(send);
     }

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 public class ExportacionActivity extends AppCompatActivity {
 
-    private AppBarConfiguration appBarConfiguration;
     private ActivityExportacionBinding binding;
 
     private RecyclerView recyclerView;

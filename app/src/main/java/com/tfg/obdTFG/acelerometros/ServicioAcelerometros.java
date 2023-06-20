@@ -65,43 +65,6 @@ public class ServicioAcelerometros extends Service implements SensorEventListene
         mIsPaused = true;
     }
 
-    private void unPausePretendLongRunningTask(){
-        mIsPaused = false;
-        startPretendLongRunningTask();
-    }
-
-    public SensorManager getMyManager() {
-        return myManager;
-    }
-
-    public void setMyManager(SensorManager myManager) {
-        this.myManager = myManager;
-    }
-
-    public IBinder getmBinder() {
-        return mBinder;
-    }
-
-    public void setmBinder(IBinder mBinder) {
-        this.mBinder = mBinder;
-    }
-
-    public Handler getmHandler() {
-        return mHandler;
-    }
-
-    public void setmHandler(Handler mHandler) {
-        this.mHandler = mHandler;
-    }
-
-    public Boolean getmIsPaused() {
-        return mIsPaused;
-    }
-
-    public void setmIsPaused(Boolean mIsPaused) {
-        this.mIsPaused = mIsPaused;
-    }
-
     @Override
     public void onTaskRemoved(Intent rootIntent){
         super.onTaskRemoved(rootIntent);
@@ -158,9 +121,6 @@ public class ServicioAcelerometros extends Service implements SensorEventListene
                 } else{
                     database.guardarGrupoAceleracion(6);
                 }
-                String format = "Aceleración(%5.1f, %5.1f, %5.1f)";
-                Object[] objectoAceleraciones = new Object[]{a[0], a[1], a[2]};
-                String acelerometros = String.format(format, Arrays.copyOf(objectoAceleraciones, objectoAceleraciones.length));
                 return;
             }
         }

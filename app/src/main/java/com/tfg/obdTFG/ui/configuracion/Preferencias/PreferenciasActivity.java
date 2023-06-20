@@ -185,11 +185,6 @@ public class PreferenciasActivity extends AppCompatActivity implements CambiarCo
         pedirMotorEncendido();
     }
 
-    public void mandarPrimerMensaje(){
-        String send = "010C";
-        enviarMensajeADispositivo(send);
-    }
-
     public void establecerCodigos(){
         motor = viewModel.consultarPreferenciasMotor();
         if(Objects.equals(motor.get("Velocidad del vehículo"), true)){

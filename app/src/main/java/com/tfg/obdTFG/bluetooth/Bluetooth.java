@@ -39,29 +39,21 @@ public class Bluetooth implements Serializable {
     private static Handler handlerMainActivity;
     private static Handler handlerVerDatos;
     public static BluetoothSocket mmSocket;
-    private boolean notInVerDatos = true;
 
-    //private final Object GUI_INITIALIZATION_MONITOR = new Object();
 
     public static final String MESSAGE_READ_STRING = "1";
     public static final String MESSAGE_DEVICE_NAME_STRING = "2";
     public static final String BLUETOOTH_ACTIVADO_STRING = "3";
-    public static final String ASK_BLUETOOTH_STRING = "4";
     public static final String SNACKBAR_MSG_STRING = "5";
     public static final String PEDIR_COMANDOS_STRING = "6";
     public static final String SNACKBAR_MSG_CONEXION_FALLIDA_STRING = "7";
-    public static final String MESSAGE_WRITE_STRING = "8";
 
-
-    //private static BluetoothAdapter btAdapter;
 
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private static final String ETIQUETA = "ConexionBluetooth";
 
     private ConnectedThread hiloConectado;
-    private ConnectedThread hiloMotorEncendido;
-    private ConnectedThread hiloParDatoValor;
     private ConnectThread hiloConexion;
 
     // constantes para indicar el estado de la conexion bluetooth
@@ -69,7 +61,6 @@ public class Bluetooth implements Serializable {
     public static final int STATE_CONECTANDO = 1;
     public static final int STATE_CONECTADOS = 2;        // estamos conectados
     private int estado;
-    private boolean yaTenemosHilo= false;
 
     private VerParDatoValorViewModel viewModelParDato;
     private boolean estamosEnViewModelParDatos = false;
@@ -146,22 +137,6 @@ public class Bluetooth implements Serializable {
         this.viewModelParDato = viewModelParDato;
     }
 
-    public Handler getHandlerVerDatos() {
-        return handlerVerDatos;
-    }
-
-    public void setHandlerVerDatos(Handler handlerVerdatos) {
-        handlerVerDatos = handlerVerdatos;
-    }
-
-    public BluetoothSocket getMmSocket() {
-        return mmSocket;
-    }
-
-    public void setMmSocket(BluetoothSocket mmSocket) {
-        this.mmSocket = mmSocket;
-    }
-
     public void setEstado(int estado){
         this.estado = estado;
     }
@@ -187,57 +162,14 @@ public class Bluetooth implements Serializable {
         if (hiloConexion != null) {hiloConexion.cancel(); hiloConexion = null;}
     }
 
-    public void cancelarHiloDatosVisores() throws InterruptedException {
-        hiloConectado.setActivo(false);
-        hiloConectado.pararHilo();
-    }
-
-    /*public void cancelarHiloParDatoValor() throws InterruptedException {
-        hiloParDatoValor.setActivo(false);
-        hiloParDatoValor.pararHilo();
-    }
-
-    public void cancelarHiloMotorEncendido() throws InterruptedException {
-        hiloMotorEncendido.pararHilo();
-    }*/
-
-    public void continuarHiloVisores(){
-        hiloConectado.continuarHilo();
-        hiloConectado.setActivo(true);
-        //hiloConectado = new ConnectedThread(0);
-        //hiloConectado.start();
-    }
-
-    /*public void continuarHiloParDatoValor(){
-        hiloParDatoValor.continuarHilo();
-        hiloParDatoValor.setActivo(true);
-    }
-
-    public void continuarHiloMotorEncendido(){
-        hiloMotorEncendido.continuarHilo();
-        hiloMotorEncendido.setActivo(true);
-    }*/
-
     public synchronized void conectados(String device){
         // cancelamos el hilo que realizo la conexion
         if (hiloConexion != null) {hiloConexion.cancel(); hiloConexion = null;}
-
-        /*Message msg = handlerMainActivity.obtainMessage(MainActivity.MESSAGE_DEVICE_NAME);
-        Bundle bundle = new Bundle();
-        bundle.putString(MainActivity.DEVICE_NAME, device);
-        msg.setData(bundle);
-        handlerMainActivity.sendMessage(msg);*/
 
         miDatoDelMainActivity = new ArrayList<>();
         miDatoDelMainActivity.add(MESSAGE_DEVICE_NAME_STRING);
         miDatoDelMainActivity.add(device);
         viewModel.setResultadoParDatoValor(miDatoDelMainActivity);
-
-        /*msg = handlerMainActivity.obtainMessage(MainActivity.SNACKBAR_MSG);
-        bundle = new Bundle();
-        bundle.putString(MainActivity.MENSAJE_SNACKBAR, "Te has conectado al dispositivo " + device + " con éxito.");
-        msg.setData(bundle);
-        handlerMainActivity.sendMessage(msg);*/
 
         miDatoDelMainActivity = new ArrayList<>();
         miDatoDelMainActivity.add(SNACKBAR_MSG_STRING);
@@ -252,37 +184,11 @@ public class Bluetooth implements Serializable {
         // Cancelamos cualquier hilo que haya conectado
         if (hiloConectado != null) {hiloConectado.cancel(); hiloConectado = null; }
 
-
-        //hiloConectado = new ConnectedThread(mmSocket);
         hiloConectado = new ConnectedThread(0);
         hiloConectado.start();
     }
 
-    /*public void iniciarTransferenciaParDatoValor(){
-        // Cancelamos cualquier hilo que haya conectado
-        if (hiloParDatoValor != null) {hiloParDatoValor.cancel(); hiloParDatoValor = null; }
-
-
-        //hiloConectado = new ConnectedThread(mmSocket);
-        hiloParDatoValor = new ConnectedThread(1);
-        hiloParDatoValor.start();
-    }
-
-    public void iniciarTransferenciaDatosPreferencias(){
-        if (hiloMotorEncendido != null) {hiloMotorEncendido.cancel(); hiloMotorEncendido = null; }
-
-
-        //hiloConectado = new ConnectedThread(mmSocket);
-        hiloMotorEncendido = new ConnectedThread(2);
-        hiloMotorEncendido.start();
-    }*/
-
     public void iniciarConexion() {
-        /*Message msg = handlerMainActivity.obtainMessage(MainActivity.BLUETOOTH_ACTIVADO);
-        Bundle bundle = new Bundle();
-        bundle.putString(MainActivity.DEVICE_NAME, null);
-        msg.setData(bundle);
-        handlerMainActivity.sendMessage(msg);*/
         miDatoDelMainActivity = new ArrayList<>();
         miDatoDelMainActivity.add(BLUETOOTH_ACTIVADO_STRING);
         viewModel.setResultadoParDatoValor(miDatoDelMainActivity);
@@ -302,48 +208,6 @@ public class Bluetooth implements Serializable {
             r.write(mensaje);
         }
     }
-
-    public synchronized String pedirMensaje(byte[] mensaje){
-        // Create temporary object
-        ConnectedThread r;
-        // sincronizamos una copia del hilo conectado
-        synchronized (this) {
-            if (estado != STATE_CONECTADOS) return null;
-            r = hiloConectado;
-        }
-        // Perform the write unsynchronized
-        if(r!=null){
-            return r.getValue(mensaje);
-        } return null;
-    }
-
-    /*public synchronized void writeParDatoValor(byte[] mensaje){
-        // Create temporary object
-        ConnectedThread r;
-        // sincronizamos una copia del hilo conectado
-        synchronized (this) {
-            if (estado != STATE_CONECTADOS) return;
-            r = hiloParDatoValor;
-        }
-        // Perform the write unsynchronized
-        if(r!=null){
-            r.write(mensaje);
-        }
-    }
-
-    public synchronized void writePreferencias (byte[] mensaje){
-        // Create temporary object
-        ConnectedThread r;
-        // sincronizamos una copia del hilo conectado
-        synchronized (this) {
-            if (estado != STATE_CONECTADOS) return;
-            r = hiloMotorEncendido;
-        }
-        // Perform the write unsynchronized
-        if(r!=null){
-            r.write(mensaje);
-        }
-    }*/
 
 
     public class ConnectThread extends Thread {
@@ -367,9 +231,6 @@ public class Bluetooth implements Serializable {
         public synchronized void run() {
             if (ActivityCompat.checkSelfPermission(contexto, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             }
-            //dejamos de buscar y cancelamos el discovery
-            //btAdapter.cancelDiscovery();
-
             try {
                 // nos conectamos
                 mmSocket.connect();
@@ -377,11 +238,6 @@ public class Bluetooth implements Serializable {
                 // Unable to connect; close the socket and return.
                 try {
                     mmSocket.close();
-                    /*Message msg = handlerMainActivity.obtainMessage(MainActivity.SNACKBAR_MSG_CONEXION_FALLIDA);
-                    Bundle bundle = new Bundle();
-                    bundle.putString(MainActivity.MENSAJE_SNACKBAR, "No se ha podido conectar al dispositivo.");
-                    msg.setData(bundle);
-                    handlerMainActivity.sendMessage(msg);*/
 
                     miDatoDelMainActivity = new ArrayList<>();
                     miDatoDelMainActivity.add(SNACKBAR_MSG_CONEXION_FALLIDA_STRING);
@@ -415,7 +271,6 @@ public class Bluetooth implements Serializable {
     }
 
     public class ConnectedThread extends Thread{
-        //private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
@@ -423,11 +278,8 @@ public class Bluetooth implements Serializable {
         private int conectado;
         private boolean activo;
 
-        //public ConnectedThread(BluetoothSocket socket) {
         //constructor para la transferencia de datos normal
         public ConnectedThread(int conectado) {
-            //mmSocket = socket;
-            //viewModel.setConexionBluetooth(socket);
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
             this.conectado = conectado;
@@ -444,32 +296,15 @@ public class Bluetooth implements Serializable {
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
 
-            /*Message msg = handlerMainActivity.obtainMessage(VerDatosVisoresActivity.PEDIR_COMANDOS);
-            Bundle bundle = new Bundle();
-            bundle.putString(VerDatosVisoresActivity.COMANDOS, "010D\r");
-            msg.setData(bundle);
-            handlerMainActivity.sendMessage(msg);*/
-
             miDatoDelMainActivity = new ArrayList<>();
             miDatoDelMainActivity.add(PEDIR_COMANDOS_STRING);
             viewModel.setResultadoParDatoValor(miDatoDelMainActivity);
-
-            /*msg = handlerVerDatos.obtainMessage(VerDatosVisoresActivity.PEDIR_COMANDOS);
-            bundle = new Bundle();
-            bundle.putString(VerDatosVisoresActivity.COMANDOS, "010D\r");
-            msg.setData(bundle);
-            handlerVerDatos.sendMessage(msg);*/
-        }
-
-        public void setActivo(boolean activo){
-            this.activo = activo;
         }
 
         String s,msg;
         public synchronized void run() {
             while (true) {
                 try {
-                    checkForPaused();
                     if(activo){
                         byte[] buffer = new byte[1];
                         int bytes = mmInStream.read(buffer, 0, buffer.length);
@@ -479,11 +314,6 @@ public class Bluetooth implements Serializable {
                             msg = msg + x;
                             if (x == 0x3e) {
                                 try{
-                                    /*if(MainActivity.mainActivity){
-                                        handlerMainActivity.obtainMessage(VerDatosVisoresActivity.MESSAGE_READ, buffer.length, -1, msg).sendToTarget();
-                                    }else{
-                                        handlerVerDatos.obtainMessage(VerDatosVisoresActivity.MESSAGE_READ, buffer.length, -1, msg).sendToTarget();
-                                    }*/
                                     if(estamosEnViewModelParDatos){
                                         viewModelParDato.setResultadoParDatoValor(msg);
                                     } else if(estamosEnViewModelEstadisticas){
@@ -516,66 +346,9 @@ public class Bluetooth implements Serializable {
             }
         }
 
-        private void checkForPaused() {
-            if(conectado==0){
-                synchronized (MainActivity.GUI_INITIALIZATION_MONITOR) {
-                    while (pauseThreadFlag) {
-                        try {
-                            MainActivity.GUI_INITIALIZATION_MONITOR.wait();
-                        } catch (Exception e) {}
-                    }
-                }
-            }/* else if(conectado == 1){
-                synchronized (MainActivity.GUI_INITIALIZATION_MONITOR2) {
-                    while (pauseThreadFlag) {
-                        try {
-                            MainActivity.GUI_INITIALIZATION_MONITOR2.wait();
-                        } catch (Exception e) {}
-                    }
-                }
-            } else {
-                synchronized (MainActivity.GUI_INITIALIZATION_MONITOR3) {
-                    while (pauseThreadFlag) {
-                        try {
-                            MainActivity.GUI_INITIALIZATION_MONITOR3.wait();
-                        } catch (Exception e) {}
-                    }
-                }
-            }*/
-        }
-
-        public void pararHilo() throws InterruptedException {
-            pauseThreadFlag = true;
-        }
-
-        public void continuarHilo() {
-            if(conectado==0){
-                synchronized(MainActivity.GUI_INITIALIZATION_MONITOR) {
-                    pauseThreadFlag = false;
-                    MainActivity.GUI_INITIALIZATION_MONITOR.notify();
-                }
-            }/*else if(conectado==1){
-                synchronized(MainActivity.GUI_INITIALIZATION_MONITOR2) {
-                    pauseThreadFlag = false;
-                    MainActivity.GUI_INITIALIZATION_MONITOR2.notify();
-                }
-            } else{
-                synchronized(MainActivity.GUI_INITIALIZATION_MONITOR3) {
-                    pauseThreadFlag = false;
-                    MainActivity.GUI_INITIALIZATION_MONITOR3.notify();
-                }
-            }*/
-
-        }
-
 
         public void write(byte[] buffer) {
             try {
-                /*if(this.activo){
-                    mmOutStream.write(buffer);
-                    handlerVerDatos.obtainMessage(VerDatosVisoresActivity.MESSAGE_WRITE, -1, -1, buffer)
-                            .sendToTarget();
-                }*/
                 if(this.activo){
                     mmOutStream.write(buffer);
                 }
@@ -591,40 +364,6 @@ public class Bluetooth implements Serializable {
                 Log.e(ETIQUETA, "close() of connect socket failed", e);
             }
         }
-
-        private String getValue(byte[] buffer){
-            try {
-                /*if(this.activo){
-                    mmOutStream.write(buffer);
-                    handlerVerDatos.obtainMessage(VerDatosVisoresActivity.MESSAGE_WRITE, -1, -1, buffer)
-                            .sendToTarget();
-                }*/
-                msg="";
-                if(this.activo){
-                    mmOutStream.write(buffer);
-                    byte[] buffer2 = new byte[1];
-                    int bytes = mmInStream.read(buffer2, 0, buffer2.length);
-                    s = new String(buffer2);
-                    for(int i = 0; i < s.length(); i++){
-                        char x = s.charAt(i);
-                        msg = msg + x;
-                        if (x == 0x3e) {
-                            try{
-                                System.out.println(msg+"\n");
-                                return msg;
-                            }catch (Exception e){
-                                System.out.println(e);
-                            }
-
-                        }
-                    }                }
-            } catch (IOException e) {
-                Log.e(ETIQUETA, "Exception during write", e);
-            }
-            return "";
-        }
-
-
 
     }
 

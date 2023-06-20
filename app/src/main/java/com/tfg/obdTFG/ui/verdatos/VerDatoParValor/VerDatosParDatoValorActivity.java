@@ -39,8 +39,6 @@ public class VerDatosParDatoValorActivity extends AppCompatActivity {
     private ArrayList<ParDatoValor> listaDatosValor = new ArrayList<>();
     private boolean primeraVezAnhadirRecycler = true;
 
-    public static final String[] listComands = new String[]{"010C", "010D", "0110", "0104", "015C", "0133", "010A", "0123", "010B", "0132", "012F", "0151", "015E", "0144",
-            "0146", "0105", "010F", "013C", "011F", "0111", "0121", "012C", "012D", "012E", "0130", "0131", "0142", "015D", "0161", "0162", "0163"};
     public static ArrayList<String> comandos = new ArrayList<>();
     public static int comandoAElegir = 0;
 

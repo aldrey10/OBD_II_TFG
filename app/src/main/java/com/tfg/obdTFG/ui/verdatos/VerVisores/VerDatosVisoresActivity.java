@@ -33,11 +33,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
     private Bluetooth bluetooth;
     private Menu menu;
     private VerDatosVisoresViewModel viewModel;
-    //private ViewModel viewmodel;
-
-    private int rpmval = 0, currenttemp = 0, Enginedisplacement = 1500, Enginetype = 0, FaceColor = 0;
-    private ArrayList<Float> velocidadMedia;
-    private ArrayList<Float> consumoMedio;
     private TextView RPM, TempAceiteMotor, VelocidadFlujoAire, CargaCalculadaMotor, PresionBarometricaAbsoluta, PresionCombustible, PresionMedidorTrenCombustible,
             PresionAbsColectorAdmision, PresionVaporSisEvaporativo, NivelCombustible, TipoCombustibleNombre, VelocidadConsumoCombustible, RelacionCombustibleAire,
             TempLiquidoEnfriamiento, TempAireAmbiente, TempAireColectorAdmision, TempCatalizador, VelocidadVehiculo,
@@ -51,14 +46,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
             GaugeEGRComandado, GaugeFallaEGR, GaugePurgaEvaporativaComand, GaugeCantidadCalentamientosDesdeNoFallas, GaugeDistanciaRecorridadSinLuzFallas,
             GaugeVoltajeModuloControl, GaugeSincroInyeccionCombustible, GaugePorcentajeTorqueSolicitado, GaugePorcentajeTorqueActual, GaugeTorqueReferenciaMotor;
 
-    //private final String[] comandos = new String[]{"ATRV", "010C", "015C", "0110", "0105", "0133", "010A", "0123", "010B", "012F", "0151", "015E", "0144", "0146", "010D"};
-    /*private final String[] comandos = new String[]{"ATRV", "015C",  "0133", "0123", "012F", "0151", "015E", "0144", "0146",  "0103", "0104","0105",
-    "0106", "0107", "0108", "0109", "010A", "010B", "010C", "010D", "010E", "010F", "0110", "0111", "0112", "0113", "0114", "011F", "0122", "0123"};*/
-
-    /*private ArrayList<String> comandosMotor = new ArrayList<>();
-    private ArrayList<String> comandosPresion = new ArrayList<>();
-    private ArrayList<String> comandosCombustible = new ArrayList<>();
-    private ArrayList<String> comandosTemperatura = new ArrayList<>();*/
     private ArrayList<String> comandos = new ArrayList<>();
 
 
@@ -72,13 +59,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
 
     private final String[] tiposComandos = new String[]{"ATDP", "ATS0", "ATL0", "ATAT0", "ATST10", "ATSPA0", "ATE0"};
     private int comandoAElegir = 0;
-
-    public static final int MESSAGE_READ = 1;
-    public static final int PEDIR_COMANDOS = 2;
-    public static final int MESSAGE_WRITE = 3;
-    public static final String COMANDOS = "mis_comandos";
-
-    private Handler handler;
 
     private DatoOBDHelper contactarBD;
     private HashMap<String, Boolean> motor;
@@ -175,9 +155,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
         GaugeTempCatalizador = (Gauge) findViewById(R.id.visor4);
 
 
-        velocidadMedia = new ArrayList<Float>();
-        consumoMedio = new ArrayList<Float>();
-
 
         contactarBD = new DatoOBDHelper(this);
         bluetooth = MainActivity.bluetooth;
@@ -186,10 +163,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
 
         establecerCodigos();
         comandos = MainActivity.comandos;
-        /*motor = viewModel.consultarPreferenciasMotor();
-        presion = viewModel.consultarPreferenciasPresion();
-        combustible = viewModel.consultarPreferenciasCombustible();
-        temperatura = viewModel.consultarPreferenciasTemperatura();*/
         cambiarTitulos("Motor");
 
 
@@ -255,46 +228,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
                     }
                 };
                 viewModel.getMiDato().observe(this, observer);
-
-                /*HandlerThread handlerThread = new HandlerThread("MyHandlerThread");
-                handlerThread.start();
-                Looper looper = handlerThread.getLooper();*/
-                /*MainActivity.handlerVerDatosVisores = new Handler(new Handler.Callback() {
-                    @Override
-                    public boolean handleMessage(Message msg) {
-                        switch (msg.what) {
-                            case MESSAGE_WRITE:
-                                byte[] writeBuf = (byte[]) msg.obj;
-                                // construct a string from the buffer
-                                String writeMessage = new String(writeBuf);
-                                break;
-                            case PEDIR_COMANDOS:
-                                // lista de comandos que se mandan a OBD II, es decir, lista de datos que queremos saber (velocidad, RPM, etc)
-                                pedirComandos();
-                                break;
-                            case MESSAGE_READ:
-                                // interpretamos el mensaje que nos manda el OBD II (el valor)
-                                mostrarDatos(msg.obj.toString());
-                                break;
-                            default:
-                                break;
-                        }
-                        return false;
-                    }
-                });
-                handler = MainActivity.handlerVerDatosVisores;
-                bluetooth.setHandlerVerDatos(handler);
-                MainActivity.mainActivity = false;
-
-                /*handler = MainActivity.handlerVerDatosVisores;
-                bluetooth.setHandlerVerDatos(handler);
-                if(MainActivity.primeraVezVerDatos){
-                    bluetooth.iniciarTransferenciaDatosVisores();
-                    MainActivity.primeraVezVerDatos = false;
-                }else{
-                    bluetooth.continuarHiloVisores();
-                    pedirComandos();
-                }*/
             }
         }
 
@@ -312,12 +245,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
             });
         }
 
-    }
-
-
-    public void mandarPrimerMensaje(){
-        String send = "010C";
-        enviarMensajeADispositivo(send);
     }
 
 
@@ -745,20 +672,6 @@ public class VerDatosVisoresActivity extends AppCompatActivity {
             comandoAElegir++;
         }
 
-    }
-
-    public void pedirComandos() {
-        String send = tiposComandos[comandoAElegir];
-        System.out.println(send + "\n");
-        enviarMensajeADispositivo(send);
-    }
-
-    private float calculateAverage(ArrayList<Float> listavg) {
-        float sum = 0;
-        for (float val : listavg) {
-            sum += val;
-        }
-        return sum / listavg.size();
     }
 
     //comunicacion de mensajes con el vehiculo

@@ -63,14 +63,11 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
 
     private static boolean bluetoothEstaHabilitado = false;
     private static int REQUEST_ENABLE_BT = 1;
-    private static int REQUEST_WRITE_EXTERNAL_STORAGE = 2;
 
     public static Bluetooth bluetooth;
     public DatoOBDHelper database;
-    public static boolean primeraVezVerDatos = true;
     public static boolean cocheEncendido = false;
-    //public static boolean primeraVezPreferencias = true;
-    //public static boolean primeraVezVerParDatoValor = true;
+
     public static boolean pidiendoPreferencias = false;
     private boolean firstTime=true;
     private boolean esVisores = false;
@@ -80,19 +77,8 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
     public static boolean hiloDatosPreferencias = false;
 
     public static final Object GUI_INITIALIZATION_MONITOR = new Object();
-    //public static final Object GUI_INITIALIZATION_MONITOR2 = new Object();
-    //public static final Object GUI_INITIALIZATION_MONITOR3 = new Object();
-
-    public static Handler handlerVerDatosVisores;
-    //public static Handler handlerVerParDatoValor;
-    //public static Handler handlerPreferencias;
-
-    //public static HandlerThread handlerThreadPreferencias;
-    //public static HandlerThread handlerThreadVerParDatoValor;
     public static HandlerThread handlerThreadVerDatosVisores;
 
-    //public static Looper looperPreferencias;
-    //public static Looper looperVerParDatoValor;
     public static Looper looperVerDatosVisores;
 
 
@@ -103,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
     private Intent enableWriteFiles;
     private ArrayList<String> listaDispositivosBluetoothNombre = new ArrayList<String>();
     private ListView listaDispositivosBluetooth;
-    private boolean conexionActiva = false;
 
     private static final String[] Android_Permissions = new String[]{
             android.Manifest.permission.BLUETOOTH_SCAN,
@@ -148,10 +133,6 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
 
     private String msgTemporal;
 
-    private int rpmval = 0, currenttemp = 0, Enginedisplacement = 1500, Enginetype = 0, FaceColor = 0;
-    private ArrayList<Double> avgconsumption;
-    private TextView Speed, RPM, Load, Fuel, Volt, Temp, Loadtext, Volttext, Temptext, Centertext;
-
     private ServiceStates srvStatus;
 
 
@@ -168,9 +149,6 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
         database.getWritableDatabase();
 
         viewModel = new MainViewModel(database);
-        //database.hola();
-
-        //database.establecerForeignKeyON();
 
         viewModel.deleteTablaBachesInit();
         viewModel.resetValoresTablaEstadisticas();
@@ -191,7 +169,6 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
 
 
         listaDispositivosBluetooth = (ListView) findViewById(R.id.listaDispositivosBluetooth);
-        //listaDispositivosBluetooth.addHeaderView(textView);
         listaDispositivosBluetooth.addHeaderView(textView, null, false);
         listaDispositivosBluetooth.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             //listener para cuando se selecciona un dispositivo Bluetooth
@@ -221,24 +198,13 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
             }
         });
 
-        /*handlerThreadPreferencias = new HandlerThread("MyHandlerThread");
-        handlerThreadPreferencias.start();
-        looperPreferencias = handlerThreadPreferencias.getLooper();*/
-
         handlerThreadVerDatosVisores = new HandlerThread("MyHandlerThread2");
         handlerThreadVerDatosVisores.start();
         looperVerDatosVisores = handlerThreadVerDatosVisores.getLooper();
 
-        /*handlerThreadVerParDatoValor = new HandlerThread("MyHandlerThread3");
-        handlerThreadVerParDatoValor.start();
-        looperVerParDatoValor = handlerThreadVerParDatoValor.getLooper();*/
-
-        //viewModel.setEstamosEnViewModelMain(true);
-
         final Observer<ArrayList<String>> observer = new Observer<ArrayList<String>>() {
             @Override
             public void onChanged(ArrayList<String> misDatos) {
-                //mostrarDatos(misDatos);
                 switch (misDatos.get(0)) {
                     case MESSAGE_WRITE_STRING:
                         break;
@@ -557,6 +523,15 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
                     View botonCancel = (View) findViewById(R.id.btnCancelar);
                     botonCancel.setVisibility(View.INVISIBLE);
                     mostrarMenu();
+                    viewModel.setBluetoothEstado(Bluetooth.STATE_NO_CONEXION);
+                    Drawable yourdrawable = menu.getItem(0).getIcon();
+                    if (bluetooth!=null){
+                        if(viewModel.getBluetoothEstado()){
+                            yourdrawable.setColorFilter(getResources().getColor(R.color.green), PorterDuff.Mode.SRC_IN);
+                        }else{
+                            yourdrawable.setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_IN);
+                        }
+                    }
                     break;
             }
             return false;
@@ -571,85 +546,6 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
 
 
     public void interpretarMensaje(String mensaje) {
-        //verDatos.mostrarDatos(mensaje);
-        /*mensaje = mensaje.replace("null", "");
-        mensaje = mensaje.substring(0, mensaje.length() - 2);
-        mensaje = mensaje.replaceAll("\n", "");
-        mensaje = mensaje.replaceAll("\r", "");
-        mensaje = mensaje.replaceAll(" ", "");
-        if (mensaje.contains("ELM327")) {
-            mensaje = mensaje.replaceAll("ATZ", "");
-            mensaje = mensaje.replaceAll("ATI", "");
-        }
-        if (mensaje.contains("ATDP")) {
-
-        }
-
-
-        int obdval = 0;
-        msgTemporal = "";
-        if (mensaje.length() > 4) {
-            if (mensaje.substring(4, 6).equals("41"))
-                try {
-                    msgTemporal = mensaje.substring(4, 8);
-                    msgTemporal = msgTemporal.trim();
-                    System.out.println("MI MENSAJE TEMPORAL ES: " + msgTemporal);
-                    obdval = Integer.parseInt(mensaje.substring(8, mensaje.length()), 16);
-                } catch (NumberFormatException nFE) {
-                }
-        }
-        if (msgTemporal.equals("410C")) {
-            int val = (int) (obdval / 4);
-            rpmval = val;
-            String texto = String.valueOf(val) + " RPM";
-            RPM.setText(texto);
-        }
-                /*else if (msgTemporal.equals("410D"))
-                {
-
-                    Speed.setText((int)(obdval));
-                }
-                else if (msgTemporal.equals("4105")){
-                    int tempC = obdval - 40;
-                    currenttemp=tempC;
-                    Temp.setText(Integer.toString(tempC) + " C°");
-                }
-                else if (msgTemporal.contains("4104"))
-                {
-                    int calcLoad = obdval * 100 / 255;
-                    Load.setText(Integer.toString(calcLoad) + " %");
-                    String avg = null;
-                    if(Enginetype==0)
-                    {
-                        if(currenttemp<=55)
-                        {
-                            avg=String.format("%10.1f", (0.001*0.004*4*Enginedisplacement*rpmval*60*calcLoad/20)).trim();
-                            avgconsumption.add((0.001*0.004*4*Enginedisplacement*rpmval*60*calcLoad/20));
-                        }
-                        else if(currenttemp>55)
-                        {
-                            avg=String.format("%10.1f", (0.001*0.003*4*Enginedisplacement*rpmval*60*calcLoad/20)).trim();
-                            avgconsumption.add((0.001*0.003*4*Enginedisplacement*rpmval*60*calcLoad/20));
-                        }
-                    }else if(Enginetype==1)
-                    {
-                        if(currenttemp<=55)
-                        {
-                            avg=String.format("%10.1f", (0.001*0.004*4*1.35*Enginedisplacement*rpmval*60*calcLoad/20)).trim();
-                            avgconsumption.add((0.001*0.004*4*1.35*Enginedisplacement*rpmval*60*calcLoad/20));
-                        }
-                        else if(currenttemp>55)
-                        {
-                            avg=String.format("%10.1f", (0.001*0.003*4*1.35*Enginedisplacement*rpmval*60*calcLoad/20)).trim();
-                            avgconsumption.add((0.001*0.003*4*1.35*Enginedisplacement*rpmval*60*calcLoad/20));
-                        }
-                    }
-                    Fuel.setText(avg  + " / " + String.format("%10.1f",calculateAverage(avgconsumption)).trim() + " L/h");
-                }
-                else if (mensaje.indexOf("V") != -1)//battery voltage
-                {
-                    Volt.setText(mensaje);
-                }*/
         ////commands/////////////
         mensaje = mensaje.replace("null", "");
         mensaje = mensaje.substring(0, mensaje.length() - 2);
@@ -952,7 +848,6 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
                 bluetooth = new Bluetooth(this, handler, btAdapter, viewModel, database);
                 viewModel.setBluetooth(bluetooth);
                 viewModel.iniciarConexion();
-                //verDatos.setBluetooth(bluetooth);
                 View botonCancelar = (View) findViewById(R.id.btnCancelar);
                 botonCancelar.setVisibility(View.VISIBLE);
             } else {
@@ -1138,32 +1033,12 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
     public void exportarDatos(View view){
         Intent intent = new Intent(MainActivity.this, ExportacionActivity.class);
         startActivity(intent);
-        /*if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Permission is not granted
-            // Should we show an explanation?
-            enableWriteFiles = new Intent(Manifest.permission.WRITE_EXTERNAL_STORAGE, Uri.parse("package:" + getPackageName()));
-            startActivityForResult(enableWriteFiles, REQUEST_WRITE_EXTERNAL_STORAGE);
-        } else {
-            database.exportDB();
-        }*/
-
-
-        /*if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        }else{
-            database.exportDB();
-        }*/
 
 
     }
 
     @Override
     public void iniciarNuevaGrabacionTrasDialog() {
-        //database.borrarTablaExport();
-        //existeGrabacionEnBD=false;
         estamosCapturando=true;
         TextView txtExportar = findViewById(R.id.textGrabacion);
         txtExportar.setText("Parar Grabación");
@@ -1285,10 +1160,6 @@ public class MainActivity extends AppCompatActivity implements MostrarConfigurac
     }
 
     public final void startService() {
-        /*Intent var1 = new Intent((Context)this, ServicioAcelerometros.class);
-        var1.setAction(ServiceStates.START.name());
-        this.startService(var1);
-        this.srvStatus = ServiceStates.START;*/
 
         Intent serviceIntent = new Intent(this, ServicioAcelerometros.class);
         startService(serviceIntent);
